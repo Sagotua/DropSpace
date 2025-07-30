@@ -1,571 +1,613 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import {
-  ShoppingCart,
-  Package,
-  TrendingUp,
-  Plus,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  CheckCircle,
-  DollarSign,
-  XCircle,
-} from "lucide-react"
-import Link from "next/link"
-import { useAuth } from "@/contexts/auth-context"
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useToast } from "@/hooks/use-toast"
 import { useRole } from "@/contexts/role-context"
+import {
+  Search,
+  Download,
+  Trash2,
+  RefreshCw,
+  Users,
+  Package,
+  Calendar,
+  Loader2,
+  ArrowUpRight,
+  Star,
+  Building2,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 
-// Mock data for dropshipper
-const dropshipperStats = [
-  {
-    title: "Створені замовлення",
-    value: "47",
-    change: "+5",
-    changeType: "increase" as const,
-    icon: ShoppingCart,
-    color: "text-blue-400",
-    description: "Всього створено",
-  },
-  {
-    title: "Прийняті замовлення",
-    value: "38",
-    change: "+3",
-    changeType: "increase" as const,
-    icon: CheckCircle,
-    color: "text-green-400",
-    description: "Підтверджено постачальниками",
-  },
-  {
-    title: "Відхилені замовлення",
-    value: "4",
-    change: "-1",
-    changeType: "decrease" as const,
-    icon: XCircle,
-    color: "text-red-400",
-    description: "Не підтверджено",
-  },
-  {
-    title: "Очікують обробки",
-    value: "5",
-    change: "+1",
-    changeType: "increase" as const,
-    icon: Clock,
-    color: "text-yellow-400",
-    description: "На розгляді",
-  },
-  {
-    title: "Загальний прибуток",
-    value: "₴18,450",
-    change: "+12%",
-    changeType: "increase" as const,
-    icon: DollarSign,
-    color: "text-purple-400",
-    description: "Маржа цього місяця",
-  },
-]
+interface Supplier {
+  id: string
+  name: string
+  email: string
+  phone: string
+  company: string
+  productsAvailable: number
+  importedProducts: number
+  lastSync: string
+  status: "active" | "inactive" | "pending"
+  rating: number
+  joinedDate: string
+}
 
-// Mock data for supplier
-const supplierStats = [
+// Mock data for suppliers
+const mockSuppliers: Supplier[] = [
   {
-    title: "Отримані замовлення",
-    value: "89",
-    change: "+8",
-    changeType: "increase" as const,
-    icon: Package,
-    color: "text-blue-400",
-    description: "Всього отримано",
-  },
-  {
-    title: "Виконані замовлення",
-    value: "67",
-    change: "+6",
-    changeType: "increase" as const,
-    icon: CheckCircle,
-    color: "text-green-400",
-    description: "Успішно завершено",
-  },
-  {
-    title: "В обробці",
-    value: "15",
-    change: "+2",
-    changeType: "increase" as const,
-    icon: Clock,
-    color: "text-yellow-400",
-    description: "Поточні замовлення",
-  },
-  {
-    title: "Мої продукти",
-    value: "456",
-    change: "+12",
-    changeType: "increase" as const,
-    icon: Package,
-    color: "text-purple-400",
-    description: "Активних позицій",
-  },
-  {
-    title: "Обсяг замовлень",
-    value: "₴67,890",
-    change: "+18%",
-    changeType: "increase" as const,
-    icon: DollarSign,
-    color: "text-green-400",
-    description: "Дохід цього місяця",
-  },
-]
-
-// Mock recent orders for dropshipper
-const dropshipperOrders = [
-  {
-    id: "#1001",
-    customer: "Марія Іваненко",
-    product: "iPhone 15 Pro",
-    amount: "$999",
-    status: "pending",
-    time: "2 хв тому",
-  },
-  {
-    id: "#1002",
-    customer: "Петро Коваленко",
-    product: "Samsung Galaxy S24",
-    amount: "$849",
-    status: "completed",
-    time: "15 хв тому",
-  },
-  {
-    id: "#1003",
-    customer: "Анна Шевченко",
-    product: "MacBook Air M3",
-    amount: "$1,299",
-    status: "processing",
-    time: "1 год тому",
-  },
-]
-
-// Mock orders for supplier
-const supplierOrders = [
-  {
-    id: "#S001",
-    dropshipper: "Олександр Петренко",
-    product: "iPhone 15 Pro",
-    amount: "$999",
-    status: "pending",
-    time: "5 хв тому",
-  },
-  {
-    id: "#S002",
-    dropshipper: "Анна Коваленко",
-    product: "Samsung Galaxy S24",
-    amount: "$849",
-    status: "accepted",
-    time: "20 хв тому",
-  },
-  {
-    id: "#S003",
-    dropshipper: "Дмитро Мельник",
-    product: "MacBook Air M3",
-    amount: "$1,299",
-    status: "shipped",
-    time: "2 год тому",
-  },
-]
-
-// Mock most sold products for dropshipper
-const dropshipperTopProducts = [
-  {
-    name: "iPhone 15 Pro",
-    sales: 45,
-    revenue: "₴44,955",
-    margin: "₴9,000",
-    trend: "up",
-  },
-  {
-    name: "Samsung Galaxy S24",
-    sales: 32,
-    revenue: "₴27,168",
-    margin: "₴4,800",
-    trend: "up",
-  },
-  {
-    name: "MacBook Air M3",
-    sales: 18,
-    revenue: "₴23,382",
-    margin: "₴3,600",
-    trend: "down",
-  },
-  {
-    name: "AirPods Pro 2",
-    sales: 24,
-    revenue: "₴5,976",
-    margin: "₴1,200",
-    trend: "up",
-  },
-]
-
-// Mock recently active dropshippers for supplier
-const supplierActiveDropshippers = [
-  {
+    id: "1",
     name: "Олександр Петренко",
-    orders: 12,
-    totalValue: "₴11,988",
-    lastOrder: "2 години тому",
+    email: "alex@techsupply.ua",
+    phone: "+380501234567",
+    company: "TechSupply Ukraine",
+    productsAvailable: 1250,
+    importedProducts: 450,
+    lastSync: "2024-01-15T10:30:00Z",
     status: "active",
+    rating: 4.8,
+    joinedDate: "2023-08-15T00:00:00Z",
   },
   {
+    id: "2",
     name: "Марія Коваленко",
-    orders: 8,
-    totalValue: "₴6,792",
-    lastOrder: "5 годин тому",
+    email: "maria@fashionhub.ua",
+    phone: "+380671234567",
+    company: "Fashion Hub",
+    productsAvailable: 890,
+    importedProducts: 230,
+    lastSync: "2024-01-14T15:45:00Z",
     status: "active",
+    rating: 4.6,
+    joinedDate: "2023-09-20T00:00:00Z",
   },
   {
-    name: "Дмитро Мельник",
-    orders: 15,
-    totalValue: "₴19,485",
-    lastOrder: "1 день тому",
-    status: "recent",
+    id: "3",
+    name: "Дмитро Іваненко",
+    email: "dmitry@homegoods.ua",
+    phone: "+380931234567",
+    company: "Home & Garden Co",
+    productsAvailable: 2100,
+    importedProducts: 0,
+    lastSync: "2024-01-10T09:15:00Z",
+    status: "active",
+    rating: 4.9,
+    joinedDate: "2023-07-10T00:00:00Z",
   },
   {
-    name: "Анна Шевченко",
-    orders: 6,
-    totalValue: "₴7,794",
-    lastOrder: "2 дні тому",
-    status: "recent",
+    id: "4",
+    name: "Анна Сидоренко",
+    email: "anna@beautyworld.ua",
+    phone: "+380441234567",
+    company: "Beauty World",
+    productsAvailable: 650,
+    importedProducts: 180,
+    lastSync: "2024-01-12T14:20:00Z",
+    status: "inactive",
+    rating: 4.3,
+    joinedDate: "2023-11-05T00:00:00Z",
+  },
+  {
+    id: "5",
+    name: "Віктор Мельник",
+    email: "viktor@sportszone.ua",
+    phone: "+380631234567",
+    company: "Sports Zone",
+    productsAvailable: 1800,
+    importedProducts: 320,
+    lastSync: "2024-01-13T11:10:00Z",
+    status: "pending",
+    rating: 4.7,
+    joinedDate: "2024-01-01T00:00:00Z",
   },
 ]
 
-export default function DashboardPage() {
-  const { user } = useAuth()
+export default function SuppliersPage() {
   const { currentRole } = useRole()
+  const { toast } = useToast()
+  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [importingSuppliers, setImportingSuppliers] = useState<Set<string>>(new Set())
+  const [deletingSuppliers, setDeletingSuppliers] = useState<Set<string>>(new Set())
 
-  if (!user) return null
+  // Redirect if not dropshipper
+  useEffect(() => {
+    if (currentRole !== "dropshipper") {
+      window.location.href = "/dashboard"
+    }
+  }, [currentRole])
 
-  const currentStats = currentRole === "dropshipper" ? dropshipperStats : supplierStats
-  const currentOrders = currentRole === "dropshipper" ? dropshipperOrders : supplierOrders
-  const currentTopProducts = currentRole === "dropshipper" ? dropshipperTopProducts : supplierActiveDropshippers
+  // Filter suppliers based on search term
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
-  const getStatusColor = (status: string) => {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  const getStatusColor = (status: Supplier["status"]) => {
     switch (status) {
-      case "completed":
+      case "active":
         return "bg-green-500/20 text-green-400 border-green-500/30"
+      case "inactive":
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
       case "pending":
         return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-      case "processing":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
-      case "accepted":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
-      case "shipped":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
   }
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: Supplier["status"]) => {
     switch (status) {
-      case "completed":
-        return "Виконано"
+      case "active":
+        return "Активний"
+      case "inactive":
+        return "Неактивний"
       case "pending":
         return "Очікує"
-      case "processing":
-        return "Обробляється"
-      case "accepted":
-        return "Прийнято"
-      case "shipped":
-        return "Відправлено"
       default:
         return status
     }
   }
 
+  const handleImportProducts = async (supplier: Supplier) => {
+    setImportingSuppliers((prev) => new Set(prev).add(supplier.id))
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      // Update supplier data
+      setSuppliers((prev) =>
+        prev.map((s) =>
+          s.id === supplier.id
+            ? {
+                ...s,
+                importedProducts: s.productsAvailable,
+                lastSync: new Date().toISOString(),
+              }
+            : s,
+        ),
+      )
+
+      toast({
+        title: "Продукти імпортовано",
+        description: `Успішно імпортовано ${supplier.productsAvailable} продуктів від ${supplier.name}`,
+      })
+    } catch (error) {
+      toast({
+        title: "Помилка імпорту",
+        description: "Не вдалося імпортувати продукти. Спробуйте ще раз.",
+        variant: "destructive",
+      })
+    } finally {
+      setImportingSuppliers((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(supplier.id)
+        return newSet
+      })
+    }
+  }
+
+  const handleDeleteProducts = async (supplier: Supplier) => {
+    setDeletingSuppliers((prev) => new Set(prev).add(supplier.id))
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      // Update supplier data
+      setSuppliers((prev) =>
+        prev.map((s) =>
+          s.id === supplier.id
+            ? {
+                ...s,
+                importedProducts: 0,
+                lastSync: new Date().toISOString(),
+              }
+            : s,
+        ),
+      )
+
+      toast({
+        title: "Продукти видалено",
+        description: `Видалено всі імпортовані продукти від ${supplier.name}`,
+      })
+    } catch (error) {
+      toast({
+        title: "Помилка видалення",
+        description: "Не вдалося видалити продукти. Спробуйте ще раз.",
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingSuppliers((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(supplier.id)
+        return newSet
+      })
+    }
+  }
+
+  const handleRefreshData = async () => {
+    setLoading(true)
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Update last sync for all suppliers
+      setSuppliers((prev) =>
+        prev.map((supplier) => ({
+          ...supplier,
+          lastSync: new Date().toISOString(),
+        })),
+      )
+
+      toast({
+        title: "Дані оновлено",
+        description: "Інформація про постачальників успішно оновлена",
+      })
+    } catch (error) {
+      toast({
+        title: "Помилка оновлення",
+        description: "Не вдалося оновити дані. Спробуйте ще раз.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const totalSuppliers = suppliers.length
+  const activeSuppliers = suppliers.filter((s) => s.status === "active").length
+  const totalAvailableProducts = suppliers.reduce((sum, s) => sum + s.productsAvailable, 0)
+  const totalImportedProducts = suppliers.reduce((sum, s) => sum + s.importedProducts, 0)
+
+  if (currentRole !== "dropshipper") {
+    return null
+  }
+
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
+      {/* Welcome Section - Matching main dashboard */}
       <div>
-        <h1 className="text-3xl font-bold text-white">
-          Панель {currentRole === "dropshipper" ? "дропшиппера" : "постачальника"}
-        </h1>
-        <p className="text-gray-400">
-          {currentRole === "dropshipper"
-            ? "Керуйте вашими замовленнями та імпортуйте продукти від постачальників"
-            : "Додавайте продукти та обробляйте замовлення від дропшипперів"}
-        </p>
+        <h1 className="text-3xl font-bold text-white">Постачальники</h1>
+        <p className="text-gray-400">Керуйте відносинами з постачальниками та імпортом продуктів</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {currentStats.map((stat, index) => (
-          <Card key={index} className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center">
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                </div>
-                <div className="flex items-center space-x-1">
-                  {stat.changeType === "increase" ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-400" />
-                  )}
-                  <span className={`text-sm ${stat.changeType === "increase" ? "text-green-400" : "text-red-400"}`}>
-                    {stat.change}
-                  </span>
-                </div>
+      {/* Stats Grid - Matching main dashboard style */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-400" />
               </div>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-400">{stat.title}</p>
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-xs text-gray-500">{stat.description}</p>
+              <div className="flex items-center space-x-1">
+                <ArrowUpRight className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-green-400">+2</span>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Recent Orders */}
-        <Card className="lg:col-span-2 space-gradient border-slate-700">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-white">
-                {currentRole === "dropshipper" ? "Останні замовлення" : "Нові замовлення"}
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                {currentRole === "dropshipper"
-                  ? "Ваші останні замовлення та їх статус"
-                  : "Замовлення від дропшипперів, що потребують обробки"}
-              </CardDescription>
             </div>
-            <Link href={currentRole === "dropshipper" ? "/dashboard/create-order" : "/dashboard/supplier-orders"}>
-              <Button size="sm" className="cosmic-glow">
-                <Plus className="w-4 h-4 mr-2" />
-                {currentRole === "dropshipper" ? "Нове замовлення" : "Переглянути всі"}
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {currentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {(currentRole === "dropshipper" ? order.customer : (order as any).dropshipper)
-                          .split(" ")
-                          .map((n: string) => n[0])
-                          .join("")}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-white font-medium">{order.id}</p>
-                      <p className="text-sm text-gray-400">
-                        {currentRole === "dropshipper" ? order.customer : (order as any).dropshipper}
-                      </p>
-                      <p className="text-sm text-gray-500">{order.product}</p>
-                    </div>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <p className="text-white font-medium">{order.amount}</p>
-                    <Badge className={`text-xs ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</Badge>
-                    <p className="text-xs text-gray-500">{order.time}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">Всього постачальників</p>
+              <p className="text-2xl font-bold text-white">{totalSuppliers}</p>
+              <p className="text-xs text-gray-500">{activeSuppliers} активних</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions & Top Products */}
+        <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center">
+                <Package className="w-6 h-6 text-purple-400" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <ArrowUpRight className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-green-400">+15%</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">Доступні продукти</p>
+              <p className="text-2xl font-bold text-white">{totalAvailableProducts.toLocaleString()}</p>
+              <p className="text-xs text-gray-500">Від усіх постачальників</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center">
+                <Download className="w-6 h-6 text-green-400" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <ArrowUpRight className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-green-400">+8%</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">Імпортовані продукти</p>
+              <p className="text-2xl font-bold text-white">{totalImportedProducts.toLocaleString()}</p>
+              <p className="text-xs text-gray-500">
+                {totalAvailableProducts > 0 ? ((totalImportedProducts / totalAvailableProducts) * 100).toFixed(1) : 0}%
+                від доступних
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <RefreshCw className={cn("w-4 h-4 text-blue-400", loading && "animate-spin")} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">Останнє оновлення</p>
+              <p className="text-2xl font-bold text-white">
+                {suppliers.length > 0
+                  ? new Date(Math.max(...suppliers.map((s) => new Date(s.lastSync).getTime()))).toLocaleDateString(
+                      "uk-UA",
+                      {
+                        month: "short",
+                        day: "numeric",
+                      },
+                    )
+                  : "—"}
+              </p>
+              <p className="text-xs text-gray-500">Найновіша синхронізація</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid - Matching dashboard layout */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Suppliers Table */}
+        <Card className="lg:col-span-2 space-gradient border-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-white">Список постачальників</CardTitle>
+              <CardDescription className="text-gray-400">
+                Керуйте імпортом продуктів від ваших постачальників
+              </CardDescription>
+            </div>
+            <Button onClick={handleRefreshData} disabled={loading} size="sm" className="cosmic-glow">
+              <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
+              Оновити
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Пошук за назвою, компанією або email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 bg-slate-800/30 border-slate-700 text-white placeholder:text-gray-400"
+                />
+              </div>
+            </div>
+
+            {/* Suppliers Table */}
+            <div className="space-y-4">
+              {filteredSuppliers.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="flex flex-col items-center space-y-2">
+                    <Users className="h-8 w-8 text-gray-400" />
+                    <p className="text-gray-400">
+                      {searchTerm ? "Постачальників не знайдено" : "Немає постачальників"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                filteredSuppliers.map((supplier) => (
+                  <div
+                    key={supplier.id}
+                    className="flex items-center justify-between p-4 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          {supplier.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <p className="text-white font-medium">{supplier.name}</p>
+                          <Badge className={`text-xs ${getStatusColor(supplier.status)}`}>
+                            {getStatusText(supplier.status)}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center space-x-4 mt-1">
+                          <div className="flex items-center space-x-1 text-sm text-gray-400">
+                            <Building2 className="w-3 h-3" />
+                            <span>{supplier.company}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-sm text-gray-400">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span>{supplier.rating}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4 mt-1">
+                          <p className="text-xs text-gray-500">
+                            Доступно: {supplier.productsAvailable.toLocaleString()} | Імпортовано:{" "}
+                            {supplier.importedProducts.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        onClick={() => handleImportProducts(supplier)}
+                        disabled={
+                          supplier.status !== "active" ||
+                          supplier.productsAvailable === 0 ||
+                          importingSuppliers.has(supplier.id)
+                        }
+                        className="cosmic-glow"
+                      >
+                        {importingSuppliers.has(supplier.id) ? (
+                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        ) : (
+                          <Download className="h-3 w-3 mr-1" />
+                        )}
+                        Імпорт
+                      </Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={supplier.importedProducts === 0 || deletingSuppliers.has(supplier.id)}
+                            className="bg-transparent border-slate-600 text-gray-300 hover:bg-slate-800/50"
+                          >
+                            {deletingSuppliers.has(supplier.id) ? (
+                              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                            ) : (
+                              <Trash2 className="h-3 w-3 mr-1" />
+                            )}
+                            Видалити
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-slate-900 border-slate-700">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-white">Видалити імпортовані продукти?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-400">
+                              Ця дія видалить всі {supplier.importedProducts.toLocaleString()} імпортованих продуктів
+                              від <strong className="text-white">{supplier.name}</strong>. Цю дію неможливо скасувати.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-transparent border-slate-600 text-gray-300 hover:bg-slate-800/50">
+                              Скасувати
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteProducts(supplier)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Видалити продукти
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions & Top Suppliers */}
         <div className="space-y-6">
           {/* Quick Actions */}
           <Card className="space-gradient border-slate-700">
             <CardHeader>
               <CardTitle className="text-white">Швидкі дії</CardTitle>
-              <CardDescription className="text-gray-400">Найчастіші операції</CardDescription>
+              <CardDescription className="text-gray-400">Найчастіші операції з постачальниками</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {currentRole === "dropshipper" ? (
-                <>
-                  <Link href="/dashboard/create-order">
-                    <Button className="w-full justify-start cosmic-glow">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Створити замовлення
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/imported-products">
-                    <Button className="w-full justify-start bg-transparent" variant="outline">
-                      <Package className="w-4 h-4 mr-2" />
-                      Імпортувати продукти
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/export">
-                    <Button className="w-full justify-start bg-transparent" variant="outline">
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      Експорт на Prom.ua
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/dashboard/add-product">
-                    <Button className="w-full justify-start cosmic-glow">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Додати продукт
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/supplier-orders">
-                    <Button className="w-full justify-start bg-transparent" variant="outline">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Обробити замовлення
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/analytics">
-                    <Button className="w-full justify-start bg-transparent" variant="outline">
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      Переглянути аналітику
-                    </Button>
-                  </Link>
-                </>
-              )}
+              <Link href="/dashboard/imported-products">
+                <Button className="w-full justify-start cosmic-glow">
+                  <Package className="w-4 h-4 mr-2" />
+                  Переглянути імпортовані продукти
+                </Button>
+              </Link>
+              <Link href="/dashboard/export">
+                <Button className="w-full justify-start bg-transparent" variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  Експорт на Prom.ua
+                </Button>
+              </Link>
+              <Button
+                className="w-full justify-start bg-transparent"
+                variant="outline"
+                onClick={handleRefreshData}
+                disabled={loading}
+              >
+                <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
+                Синхронізувати всіх
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Top Products / Active Dropshippers */}
+          {/* Top Suppliers */}
           <Card className="space-gradient border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">
-                {currentRole === "dropshipper" ? "Найпродаваніші продукти" : "Активні дропшиппери"}
-              </CardTitle>
+              <CardTitle className="text-white">Топ постачальники</CardTitle>
               <CardDescription className="text-gray-400">
-                {currentRole === "dropshipper"
-                  ? "Ваші найуспішніші продукти цього місяця"
-                  : "Дропшиппери з найбільшою активністю"}
+                Найактивніші постачальники за кількістю продуктів
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {currentRole === "dropshipper"
-                  ? dropshipperTopProducts.map((product, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-slate-800/30 rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">#{index + 1}</span>
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{product.name}</p>
-                            <p className="text-sm text-gray-400">{product.sales} продажів</p>
-                          </div>
+                {suppliers
+                  .sort((a, b) => b.productsAvailable - a.productsAvailable)
+                  .slice(0, 4)
+                  .map((supplier, index) => (
+                    <div key={supplier.id} className="flex items-center justify-between p-4 bg-slate-800/30 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold">#{index + 1}</span>
                         </div>
-                        <div className="text-right">
-                          <p className="text-white font-medium">{product.revenue}</p>
-                          <p className="text-sm text-green-400">Маржа: {product.margin}</p>
-                          <div className="flex items-center justify-end space-x-1 mt-1">
-                            {product.trend === "up" ? (
-                              <ArrowUpRight className="w-3 h-3 text-green-400" />
-                            ) : (
-                              <ArrowDownRight className="w-3 h-3 text-red-400" />
-                            )}
-                          </div>
+                        <div>
+                          <p className="text-white font-medium">{supplier.name}</p>
+                          <p className="text-sm text-gray-400">{supplier.company}</p>
                         </div>
                       </div>
-                    ))
-                  : supplierActiveDropshippers.map((dropshipper, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-slate-800/30 rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-medium">
-                              {dropshipper.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{dropshipper.name}</p>
-                            <p className="text-sm text-gray-400">{dropshipper.orders} замовлень</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-white font-medium">{dropshipper.totalValue}</p>
-                          <p className="text-sm text-gray-400">{dropshipper.lastOrder}</p>
-                          <div
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs mt-1 ${
-                              dropshipper.status === "active"
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-blue-500/20 text-blue-400"
-                            }`}
-                          >
-                            {dropshipper.status === "active" ? "Активний" : "Недавно"}
-                          </div>
+                      <div className="text-right">
+                        <p className="text-white font-medium">{supplier.productsAvailable.toLocaleString()}</p>
+                        <p className="text-sm text-gray-400">продуктів</p>
+                        <div className="flex items-center justify-end space-x-1 mt-1">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs text-gray-400">{supplier.rating}</span>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-
-      {/* Activity Timeline */}
-      <Card className="space-gradient border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Остання активність</CardTitle>
-          <CardDescription className="text-gray-400">Ваші останні дії в системі</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              {
-                action:
-                  currentRole === "dropshipper"
-                    ? "Імпортовано 15 продуктів від постачальника TechSupply"
-                    : "Нове замовлення #1001 від дропшиппера ShopMaster",
-                time: "2 години тому",
-                icon: Package,
-                color: "text-blue-400",
-              },
-              {
-                action:
-                  currentRole === "dropshipper"
-                    ? "Створено замовлення #1002 на суму $849"
-                    : "Оновлено статус замовлення #998 на 'Відправлено'",
-                time: "4 години тому",
-                icon: ShoppingCart,
-                color: "text-green-400",
-              },
-              {
-                action:
-                  currentRole === "dropshipper"
-                    ? "Експортовано 50 продуктів на Rozetka"
-                    : "Додано новий продукт 'Wireless Headphones Pro'",
-                time: "1 день тому",
-                icon: TrendingUp,
-                color: "text-purple-400",
-              },
-            ].map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-slate-800/30">
-                <div className={`w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center`}>
-                  <activity.icon className={`w-4 h-4 ${activity.color}`} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-white text-sm">{activity.action}</p>
-                  <p className="text-gray-400 text-xs flex items-center mt-1">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {activity.time}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
