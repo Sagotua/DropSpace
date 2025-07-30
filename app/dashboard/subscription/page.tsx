@@ -182,128 +182,111 @@ export default function SubscriptionPage() {
       )}
 
       {/* Subscription Plans */}
-      <div className="relative">
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-2xl blur-xl"></div>
+      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {subscriptionPlans.map((plan) => {
+          const isCurrentPlan = plan.name.toLowerCase() === currentSubscription.toLowerCase()
+          const PlanIcon = plan.icon
 
-        <div className="relative grid md:grid-cols-3 gap-8 max-w-6xl mx-auto p-8">
-          {subscriptionPlans.map((plan) => {
-            const isCurrentPlan = plan.name.toLowerCase() === currentSubscription.toLowerCase()
-            const PlanIcon = plan.icon
+          return (
+            <Card
+              key={plan.id}
+              className={`space-gradient border-slate-700 relative hover:border-slate-600 transition-all duration-300 ${
+                plan.popular ? "ring-2 ring-blue-500/50" : ""
+              } ${isCurrentPlan ? "ring-2 ring-green-500/50" : ""}`}
+            >
+              {/* Popular Badge */}
+              {plan.popular && (
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600">
+                  Популярний
+                </Badge>
+              )}
 
-            return (
-              <Card
-                key={plan.id}
-                className={`space-gradient border-slate-700 relative hover:border-slate-600 transition-all duration-500 hover:scale-105 hover:shadow-2xl group ${
-                  plan.popular ? "ring-2 ring-blue-500/50 hover:ring-blue-400/70" : ""
-                } ${isCurrentPlan ? "ring-2 ring-green-500/50 hover:ring-green-400/70" : ""}`}
-              >
-                {/* Hover gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+              {/* Current Plan Badge */}
+              {isCurrentPlan && (
+                <Badge className="absolute -top-3 right-4 bg-green-500 hover:bg-green-600">Поточний план</Badge>
+              )}
 
-                {/* Popular Badge */}
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600 animate-pulse">
-                    ⭐ Популярний
-                  </Badge>
-                )}
+              <CardHeader className="text-center pb-4">
+                <div
+                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-4`}
+                >
+                  <PlanIcon className={`w-8 h-8 ${plan.color}`} />
+                  {plan.name === "Cosmos" && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
+                </div>
 
-                {/* Current Plan Badge */}
-                {isCurrentPlan && (
-                  <Badge className="absolute -top-3 right-4 bg-green-500 hover:bg-green-600 animate-pulse">
-                    ✅ Поточний план
-                  </Badge>
-                )}
+                <CardTitle className="text-white text-xl flex items-center justify-center space-x-2">
+                  <span>{plan.name}</span>
+                </CardTitle>
 
-                <CardHeader className="text-center pb-4 relative z-10">
-                  <div
-                    className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-xl`}
-                  >
-                    <PlanIcon className={`w-8 h-8 ${plan.color} group-hover:animate-pulse`} />
-                    {plan.name === "Cosmos" && <Star className="w-4 h-4 text-yellow-400 ml-1 animate-spin" />}
+                <div className="space-y-2">
+                  <div className="text-3xl font-bold text-white">
+                    ${plan.price}
+                    <span className="text-lg text-gray-400 font-normal">{plan.period}</span>
                   </div>
+                  <CardDescription className="text-gray-400">{plan.description}</CardDescription>
+                </div>
+              </CardHeader>
 
-                  <CardTitle className="text-white text-xl flex items-center justify-center space-x-2 group-hover:text-blue-300 transition-colors duration-300">
-                    <span>{plan.name}</span>
-                  </CardTitle>
+              <CardContent className="space-y-6">
+                {/* Features List */}
+                <ul className="space-y-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center space-x-3">
+                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <span className="text-gray-300 text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                  <div className="space-y-2">
-                    <div className="text-3xl font-bold text-white group-hover:text-blue-200 transition-colors duration-300">
-                      ${plan.price}
-                      <span className="text-lg text-gray-400 font-normal group-hover:text-gray-300 transition-colors duration-300">
-                        {plan.period}
-                      </span>
-                    </div>
-                    <CardDescription className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-                      {plan.description}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-6 relative z-10">
-                  {/* Features List */}
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center space-x-3 group-hover:text-gray-200 transition-colors duration-300"
-                      >
-                        <Check className="w-4 h-4 text-green-400 flex-shrink-0 group-hover:text-green-300 transition-colors duration-300" />
-                        <span className="text-gray-300 text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Action Button */}
-                  <Button
-                    className={`w-full transition-all duration-300 hover:scale-105 ${
-                      plan.buttonVariant === "default"
-                        ? "cosmic-glow hover:shadow-2xl hover:shadow-blue-500/50"
-                        : "bg-transparent border-slate-600 hover:bg-slate-700 hover:border-slate-500"
-                    }`}
-                    variant={plan.buttonVariant}
-                    onClick={() => handlePlanSelect(plan.id)}
-                    disabled={isCurrentPlan || isProcessing}
-                  >
-                    {isProcessing && selectedPlan === plan.id ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                        Обробка...
-                      </>
-                    ) : isCurrentPlan ? (
-                      "Поточний план"
-                    ) : (
-                      plan.buttonText
-                    )}
-                  </Button>
-
-                  {/* Upgrade/Downgrade hints */}
-                  {!isCurrentPlan && currentSubscription !== "Test" && (
-                    <div className="text-center">
-                      {plan.price >
-                      (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
-                        ?.price || 0) ? (
-                        <p className="text-xs text-blue-400 flex items-center justify-center group-hover:text-blue-300 transition-colors duration-300">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          Покращення плану
-                        </p>
-                      ) : (
-                        plan.price <
-                          (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
-                            ?.price || 0) && (
-                          <p className="text-xs text-yellow-400 flex items-center justify-center group-hover:text-yellow-300 transition-colors duration-300">
-                            <AlertCircle className="w-3 h-3 mr-1" />
-                            Зміна плану
-                          </p>
-                        )
-                      )}
-                    </div>
+                {/* Action Button */}
+                <Button
+                  className={`w-full ${
+                    plan.buttonVariant === "default"
+                      ? "cosmic-glow"
+                      : "bg-transparent border-slate-600 hover:bg-slate-700"
+                  }`}
+                  variant={plan.buttonVariant}
+                  onClick={() => handlePlanSelect(plan.id)}
+                  disabled={isCurrentPlan || isProcessing}
+                >
+                  {isProcessing && selectedPlan === plan.id ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Обробка...
+                    </>
+                  ) : isCurrentPlan ? (
+                    "Поточний план"
+                  ) : (
+                    plan.buttonText
                   )}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                </Button>
+
+                {/* Upgrade/Downgrade hints */}
+                {!isCurrentPlan && currentSubscription !== "Test" && (
+                  <div className="text-center">
+                    {plan.price >
+                    (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())?.price ||
+                      0) ? (
+                      <p className="text-xs text-blue-400 flex items-center justify-center">
+                        <TrendingUp className="w-3 h-3 mr-1" />
+                        Покращення плану
+                      </p>
+                    ) : (
+                      plan.price <
+                        (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
+                          ?.price || 0) && (
+                        <p className="text-xs text-yellow-400 flex items-center justify-center">
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          Зміна плану
+                        </p>
+                      )
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {/* Features Comparison */}
