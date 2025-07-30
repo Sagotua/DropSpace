@@ -4,422 +4,991 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CreditCard, Check, Star, AlertCircle, Crown, Shield, TrendingUp, Clock } from "lucide-react"
+import {
+  Upload,
+  Settings,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertCircle,
+  Eye,
+  RefreshCw,
+  ExternalLink,
+  Key,
+  Zap,
+  Package,
+  Search,
+  TrendingUp,
+} from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { useRole } from "@/contexts/role-context"
 
-const subscriptionPlans = [
+// Mock data for products
+const mockProducts = [
   {
-    id: "test",
-    name: "Test",
-    price: 0,
-    period: "14 днів безкоштовно",
-    description: "Безкоштовно на 14 днів",
-    features: [
-      "До 50 продуктів",
-      "До 10 замовлень на місяць",
-      "Базова аналітика",
-      "Email підтримка",
-      "Експорт на 1 маркетплейс",
-    ],
-    buttonText: "Почати тест",
-    buttonVariant: "outline" as const,
-    popular: false,
-    icon: Clock,
-    color: "text-gray-400",
-    bgGradient: "from-gray-500/20 to-slate-600/20",
+    id: "PRD001",
+    name: "iPhone 15 Pro",
+    sku: "IPH15PRO-256",
+    category: "Смартфони",
+    price: 32000,
+    stock: 25,
+    status: "active",
+    image: "/placeholder.svg?height=60&width=60&text=📱",
+    promStatus: "exported",
+    rozetkaStatus: "pending",
+    lastExported: "2024-01-15T10:30:00Z",
   },
   {
-    id: "standard",
-    name: "Standard",
-    price: 5,
-    period: "/міс",
-    description: "Для малого бізнесу",
-    features: [
-      "До 1,000 продуктів",
-      "Необмежені замовлення",
-      "Розширена аналітика",
-      "Пріоритетна підтримка",
-      "Експорт на всі маркетплейси",
-      "API доступ",
-      "Автоматизація замовлень",
-    ],
-    buttonText: "Обрати план",
-    buttonVariant: "default" as const,
-    popular: true,
-    icon: Shield,
-    color: "text-blue-400",
-    bgGradient: "from-blue-500/20 to-purple-600/20",
+    id: "PRD002",
+    name: "Samsung Galaxy S24",
+    sku: "SGS24-128",
+    category: "Смартфони",
+    price: 28000,
+    stock: 18,
+    status: "active",
+    image: "/placeholder.svg?height=60&width=60&text=📱",
+    promStatus: "failed",
+    rozetkaStatus: "exported",
+    lastExported: "2024-01-14T15:20:00Z",
   },
   {
-    id: "cosmos",
-    name: "Cosmos",
-    price: 25,
-    period: "/міс",
-    description: "Для професіоналів",
-    features: [
-      "Необмежені продукти",
-      "Необмежені замовлення",
-      "Преміум аналітика",
-      "24/7 підтримка",
-      "Всі інтеграції",
-      "Персональний менеджер",
-      "Білий лейбл",
-      "Кастомні звіти",
-      "Приоритетні оновлення",
-    ],
-    buttonText: "Обрати план",
-    buttonVariant: "outline" as const,
-    popular: false,
-    icon: Crown,
-    color: "text-yellow-400",
-    bgGradient: "from-yellow-500/20 to-orange-600/20",
+    id: "PRD003",
+    name: "MacBook Air M3",
+    sku: "MBA-M3-256",
+    category: "Ноутбуки",
+    price: 45000,
+    stock: 8,
+    status: "active",
+    image: "/placeholder.svg?height=60&width=60&text=💻",
+    promStatus: "not_exported",
+    rozetkaStatus: "not_exported",
+    lastExported: null,
   },
 ]
 
-export default function SubscriptionPage() {
+// Mock integration status
+const mockIntegrations = {
+  prom: {
+    connected: true,
+    apiKey: "prom_****_****_****_1234",
+    lastSync: "2024-01-15T10:30:00Z",
+    status: "active",
+  },
+  rozetka: {
+    connected: false,
+    apiKey: null,
+    lastSync: null,
+    status: "disconnected",
+  },
+}
+
+interface ExportJob {
+  id: string
+  platform: "prom" | "rozetka"
+  status: "pending" | "running" | "completed" | "failed"
+  progress: number
+  totalProducts: number
+  successCount: number
+  failedCount: number
+  startedAt: string
+  completedAt?: string
+  errors?: string[]
+}
+
+export default function ExportPage() {
   const { user } = useAuth()
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const { currentRole } = useRole()
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
+  const [exportJobs, setExportJobs] = useState<ExportJob[]>([])
+  const [isExporting, setIsExporting] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [integrations, setIntegrations] = useState(mockIntegrations)
+  const [showCredentialsDialog, setShowCredentialsDialog] = useState(false)
+  const [currentPlatform, setCurrentPlatform] = useState<"prom" | "rozetka">("prom")
+
+  // Filter products based on search and filters
+  const filteredProducts = mockProducts.filter((product) => {
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
+    const matchesStatus = statusFilter === "all" || product.status === statusFilter
+    return matchesSearch && matchesCategory && matchesStatus
+  })
+
+  // Calculate stats
+  const totalProducts = mockProducts.length
+  const exportedProducts = mockProducts.filter(
+    (p) => p.promStatus === "exported" || p.rozetkaStatus === "exported",
+  ).length
+  const pendingProducts = mockProducts.filter((p) => p.promStatus === "pending" || p.rozetkaStatus === "pending").length
+  const failedProducts = mockProducts.filter((p) => p.promStatus === "failed" || p.rozetkaStatus === "failed").length
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "exported":
+        return "bg-green-500/20 text-green-400 border-green-500/30"
+      case "pending":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+      case "failed":
+        return "bg-red-500/20 text-red-400 border-red-500/30"
+      case "not_exported":
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
+      default:
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "exported":
+        return "Експортовано"
+      case "pending":
+        return "Очікує"
+      case "failed":
+        return "Помилка"
+      case "not_exported":
+        return "Не експортовано"
+      default:
+        return status
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "exported":
+        return <CheckCircle className="w-4 h-4" />
+      case "pending":
+        return <Clock className="w-4 h-4" />
+      case "failed":
+        return <XCircle className="w-4 h-4" />
+      case "not_exported":
+        return <AlertCircle className="w-4 h-4" />
+      default:
+        return <AlertCircle className="w-4 h-4" />
+    }
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProducts(filteredProducts.map((p) => p.id))
+    } else {
+      setSelectedProducts([])
+    }
+  }
+
+  const handleProductSelect = (productId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedProducts((prev) => [...prev, productId])
+    } else {
+      setSelectedProducts((prev) => prev.filter((id) => id !== productId))
+    }
+  }
+
+  const handlePlatformSelect = (platform: string, checked: boolean) => {
+    if (checked) {
+      setSelectedPlatforms((prev) => [...prev, platform])
+    } else {
+      setSelectedPlatforms((prev) => prev.filter((p) => p !== platform))
+    }
+  }
+
+  const handleExport = async () => {
+    if (selectedProducts.length === 0 || selectedPlatforms.length === 0) {
+      return
+    }
+
+    setIsExporting(true)
+
+    // Create export jobs for each platform
+    const newJobs: ExportJob[] = selectedPlatforms.map((platform) => ({
+      id: `job_${Date.now()}_${platform}`,
+      platform: platform as "prom" | "rozetka",
+      status: "pending",
+      progress: 0,
+      totalProducts: selectedProducts.length,
+      successCount: 0,
+      failedCount: 0,
+      startedAt: new Date().toISOString(),
+    }))
+
+    setExportJobs((prev) => [...prev, ...newJobs])
+
+    // Simulate export process
+    for (const job of newJobs) {
+      await simulateExport(job)
+    }
+
+    setIsExporting(false)
+  }
+
+  const simulateExport = async (job: ExportJob) => {
+    // Update job status to running
+    setExportJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, status: "running" } : j)))
+
+    // Simulate progress
+    for (let i = 0; i <= job.totalProducts; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const progress = (i / job.totalProducts) * 100
+      const success = Math.random() > 0.2 // 80% success rate
+
+      setExportJobs((prev) =>
+        prev.map((j) =>
+          j.id === job.id
+            ? {
+                ...j,
+                progress,
+                successCount: success ? i : j.successCount,
+                failedCount: success ? j.failedCount : i - j.successCount,
+              }
+            : j,
+        ),
+      )
+    }
+
+    // Complete the job
+    setExportJobs((prev) =>
+      prev.map((j) =>
+        j.id === job.id
+          ? {
+              ...j,
+              status: job.failedCount > 0 ? "failed" : "completed",
+              completedAt: new Date().toISOString(),
+              errors: job.failedCount > 0 ? ["Деякі продукти не вдалося експортувати"] : undefined,
+            }
+          : j,
+      ),
+    )
+  }
+
+  const handleConnectPlatform = (platform: "prom" | "rozetka") => {
+    setCurrentPlatform(platform)
+    setShowCredentialsDialog(true)
+  }
+
+  const handleSaveCredentials = (apiKey: string) => {
+    setIntegrations((prev) => ({
+      ...prev,
+      [currentPlatform]: {
+        connected: true,
+        apiKey: `${currentPlatform}_****_****_****_${apiKey.slice(-4)}`,
+        lastSync: new Date().toISOString(),
+        status: "active",
+      },
+    }))
+    setShowCredentialsDialog(false)
+  }
 
   if (!user) return null
 
-  const currentSubscription = user.subscription || "Test"
-
-  const handlePlanSelect = (planId: string) => {
-    if (planId === currentSubscription.toLowerCase()) return
-
-    setSelectedPlan(planId)
-
-    if (planId === "test") {
-      // Handle test plan activation
-      handleTestActivation()
-    } else {
-      // Open payment modal for paid plans
-      setShowPaymentModal(true)
-    }
-  }
-
-  const handleTestActivation = async () => {
-    setIsProcessing(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    alert("Тестовий період активовано на 14 днів!")
-    setIsProcessing(false)
-  }
-
-  const handlePayment = async () => {
-    setIsProcessing(true)
-
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // In a real app, this would integrate with Stripe/Paddle
-    alert(`Підписка "${selectedPlan}" успішно активована!`)
-
-    setIsProcessing(false)
-    setShowPaymentModal(false)
-    setSelectedPlan(null)
-  }
-
-  const handleCancelSubscription = () => {
-    if (confirm("Ви впевнені, що хочете скасувати підписку?")) {
-      alert("Підписка буде скасована в кінці поточного періоду")
-    }
-  }
-
-  const getNextBillingDate = () => {
-    const date = new Date()
-    date.setMonth(date.getMonth() + 1)
-    return date.toLocaleDateString("uk-UA")
-  }
-
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-white">Підписка</h1>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          Оберіть план, який найкраще підходить для вашого бізнесу. Ви можете змінити або скасувати підписку в будь-який
-          час.
-        </p>
+      {/* Header - Matching main dashboard style */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white flex items-center">
+            <Upload className="w-8 h-8 mr-3 text-blue-400" />
+            Експорт продуктів
+          </h1>
+          <p className="text-gray-400 mt-1">Експортуйте ваші продукти на Prom.ua та Rozetka</p>
+        </div>
+        <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+          {currentRole === "dropshipper" ? "Дропшиппер" : "Постачальник"}
+        </Badge>
       </div>
 
-      {/* Current Subscription Status */}
-      {currentSubscription && (
-        <Card className="space-gradient border-slate-700 max-w-2xl mx-auto">
+      {/* Stats Cards - Matching main dashboard grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="space-gradient border-slate-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-white font-medium">Поточна підписка: {currentSubscription}</h3>
-                  <p className="text-sm text-gray-400">
-                    {currentSubscription === "Test"
-                      ? "Тестовий період до 15.02.2024"
-                      : `Наступне списання: ${getNextBillingDate()}`}
-                  </p>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-gray-400">Всього продуктів</p>
+                <p className="text-2xl font-bold text-white">{totalProducts}</p>
+                <p className="text-xs text-gray-500 mt-1">Доступно для експорту</p>
               </div>
-              {currentSubscription !== "Test" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCancelSubscription}
-                  className="bg-transparent border-red-500 text-red-400 hover:bg-red-500/10"
-                >
-                  Скасувати
-                </Button>
-              )}
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <Package className="w-6 h-6 text-blue-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Subscription Plans */}
-      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {subscriptionPlans.map((plan) => {
-          const isCurrentPlan = plan.name.toLowerCase() === currentSubscription.toLowerCase()
-          const PlanIcon = plan.icon
+        <Card className="space-gradient border-slate-700">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400">Експортовано</p>
+                <p className="text-2xl font-bold text-white">{exportedProducts}</p>
+                <p className="text-xs text-green-400 mt-1 flex items-center">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  {Math.round((exportedProducts / totalProducts) * 100)}% успішно
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          return (
-            <Card
-              key={plan.id}
-              className={`space-gradient border-slate-700 relative hover:border-slate-600 transition-all duration-300 ${
-                plan.popular ? "ring-2 ring-blue-500/50" : ""
-              } ${isCurrentPlan ? "ring-2 ring-green-500/50" : ""}`}
-            >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600">
-                  Популярний
-                </Badge>
-              )}
+        <Card className="space-gradient border-slate-700">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400">Очікують</p>
+                <p className="text-2xl font-bold text-white">{pendingProducts}</p>
+                <p className="text-xs text-yellow-400 mt-1 flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />В процесі
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-yellow-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              {/* Current Plan Badge */}
-              {isCurrentPlan && (
-                <Badge className="absolute -top-3 right-4 bg-green-500 hover:bg-green-600">Поточний план</Badge>
-              )}
+        <Card className="space-gradient border-slate-700">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400">Помилки</p>
+                <p className="text-2xl font-bold text-white">{failedProducts}</p>
+                <p className="text-xs text-red-400 mt-1 flex items-center">
+                  <XCircle className="w-3 h-3 mr-1" />
+                  Потребують уваги
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <XCircle className="w-6 h-6 text-red-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-              <CardHeader className="text-center pb-4">
-                <div
-                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-4`}
-                >
-                  <PlanIcon className={`w-8 h-8 ${plan.color}`} />
-                  {plan.name === "Cosmos" && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
-                </div>
-
-                <CardTitle className="text-white text-xl flex items-center justify-center space-x-2">
-                  <span>{plan.name}</span>
-                </CardTitle>
-
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold text-white">
-                    ${plan.price}
-                    <span className="text-lg text-gray-400 font-normal">{plan.period}</span>
+      {/* Main Content Grid - Matching dashboard layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Platform Integration Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="space-gradient border-slate-700">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <ExternalLink className="w-5 h-5 text-orange-400" />
                   </div>
-                  <CardDescription className="text-gray-400">{plan.description}</CardDescription>
+                  <div>
+                    <CardTitle className="text-white">Prom.ua</CardTitle>
+                    <CardDescription>Інтеграція з Prom.ua</CardDescription>
+                  </div>
                 </div>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                {/* Features List */}
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center space-x-3">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300 text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Action Button */}
-                <Button
-                  className={`w-full ${
-                    plan.buttonVariant === "default"
-                      ? "cosmic-glow"
-                      : "bg-transparent border-slate-600 hover:bg-slate-700"
-                  }`}
-                  variant={plan.buttonVariant}
-                  onClick={() => handlePlanSelect(plan.id)}
-                  disabled={isCurrentPlan || isProcessing}
+                <Badge
+                  className={
+                    integrations.prom.connected
+                      ? "bg-green-500/20 text-green-400 border-green-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }
                 >
-                  {isProcessing && selectedPlan === plan.id ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                      Обробка...
-                    </>
-                  ) : isCurrentPlan ? (
-                    "Поточний план"
-                  ) : (
-                    plan.buttonText
-                  )}
-                </Button>
-
-                {/* Upgrade/Downgrade hints */}
-                {!isCurrentPlan && currentSubscription !== "Test" && (
-                  <div className="text-center">
-                    {plan.price >
-                    (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())?.price ||
-                      0) ? (
-                      <p className="text-xs text-blue-400 flex items-center justify-center">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        Покращення плану
-                      </p>
-                    ) : (
-                      plan.price <
-                        (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
-                          ?.price || 0) && (
-                        <p className="text-xs text-yellow-400 flex items-center justify-center">
-                          <AlertCircle className="w-3 h-3 mr-1" />
-                          Зміна плану
-                        </p>
-                      )
-                    )}
+                  {integrations.prom.connected ? "Підключено" : "Не підключено"}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                {integrations.prom.connected ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">API ключ:</span>
+                      <span className="text-white font-mono">{integrations.prom.apiKey}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Остання синхронізація:</span>
+                      <span className="text-white">
+                        {new Date(integrations.prom.lastSync!).toLocaleString("uk-UA")}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-transparent border-slate-600 hover:bg-slate-700"
+                      onClick={() => handleConnectPlatform("prom")}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Налаштувати
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-400">Підключіть ваш акаунт Prom.ua для експорту продуктів</p>
+                    <Button className="w-full cosmic-glow" onClick={() => handleConnectPlatform("prom")}>
+                      <Key className="w-4 h-4 mr-2" />
+                      Підключити Prom.ua
+                    </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
-          )
-        })}
-      </div>
 
-      {/* Features Comparison */}
-      <Card className="space-gradient border-slate-700 max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-white text-center">Порівняння можливостей</CardTitle>
-          <CardDescription className="text-gray-400 text-center">
-            Детальне порівняння всіх планів підписки
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-3 text-gray-300">Можливості</th>
-                  <th className="text-center py-3 text-gray-300">Test</th>
-                  <th className="text-center py-3 text-gray-300">Standard</th>
-                  <th className="text-center py-3 text-gray-300">Cosmos</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {[
-                  { feature: "Кількість продуктів", test: "50", standard: "1,000", cosmos: "Необмежено" },
-                  { feature: "Замовлення на місяць", test: "10", standard: "Необмежено", cosmos: "Необмежено" },
-                  { feature: "Аналітика", test: "Базова", standard: "Розширена", cosmos: "Преміум" },
-                  { feature: "Підтримка", test: "Email", standard: "Пріоритетна", cosmos: "24/7" },
-                  { feature: "API доступ", test: "❌", standard: "✅", cosmos: "✅" },
-                  { feature: "Персональний менеджер", test: "❌", standard: "❌", cosmos: "✅" },
-                ].map((row, index) => (
-                  <tr key={index} className="border-b border-slate-800">
-                    <td className="py-3 text-gray-300">{row.feature}</td>
-                    <td className="py-3 text-center text-gray-400">{row.test}</td>
-                    <td className="py-3 text-center text-gray-300">{row.standard}</td>
-                    <td className="py-3 text-center text-white">{row.cosmos}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* FAQ Section */}
-      <Card className="space-gradient border-slate-700 max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-white text-center">Часті питання</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {[
-              {
-                question: "Чи можу я змінити план в будь-який час?",
-                answer: "Так, ви можете покращити або змінити план в будь-який час. Зміни набудуть чинності негайно.",
-              },
-              {
-                question: "Що відбувається після закінчення тестового періоду?",
-                answer:
-                  "Після закінчення 14-денного тестового періоду ваш акаунт буде обмежений. Ви можете обрати платний план для продовження роботи.",
-              },
-              {
-                question: "Чи є знижки для річної оплати?",
-                answer: "Так, при оплаті за рік ви отримуєте знижку 20% на всі платні плани.",
-              },
-              {
-                question: "Чи можу я скасувати підписку?",
-                answer:
-                  "Так, ви можете скасувати підписку в будь-який час. Доступ до платних функцій збережеться до кінця оплаченого періоду.",
-              },
-            ].map((faq, index) => (
-              <div key={index} className="space-y-2">
-                <h4 className="text-white font-medium">{faq.question}</h4>
-                <p className="text-gray-400 text-sm">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment Modal */}
-      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="bg-slate-900 border-slate-700 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white">Підтвердження підписки</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Ви обрали план "{subscriptionPlans.find((p) => p.id === selectedPlan)?.name}"
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6">
-            {selectedPlan && (
-              <div className="p-4 bg-slate-800/30 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">План:</span>
-                  <span className="text-white font-medium">
-                    {subscriptionPlans.find((p) => p.id === selectedPlan)?.name}
-                  </span>
+            <Card className="space-gradient border-slate-700">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <ExternalLink className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Rozetka</CardTitle>
+                    <CardDescription>Інтеграція з Rozetka</CardDescription>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-gray-300">Ціна:</span>
-                  <span className="text-white font-medium">
-                    ${subscriptionPlans.find((p) => p.id === selectedPlan)?.price}/міс
-                  </span>
+                <Badge
+                  className={
+                    integrations.rozetka.connected
+                      ? "bg-green-500/20 text-green-400 border-green-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }
+                >
+                  {integrations.rozetka.connected ? "Підключено" : "Не підключено"}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                {integrations.rozetka.connected ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">API ключ:</span>
+                      <span className="text-white font-mono">{integrations.rozetka.apiKey}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Остання синхронізація:</span>
+                      <span className="text-white">
+                        {new Date(integrations.rozetka.lastSync!).toLocaleString("uk-UA")}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-transparent border-slate-600 hover:bg-slate-700"
+                      onClick={() => handleConnectPlatform("rozetka")}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Налаштувати
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-400">Підключіть ваш акаунт Rozetka для експорту продуктів</p>
+                    <Button className="w-full cosmic-glow" onClick={() => handleConnectPlatform("rozetka")}>
+                      <Key className="w-4 h-4 mr-2" />
+                      Підключити Rozetka
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Export Controls */}
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Налаштування експорту</CardTitle>
+              <CardDescription>Виберіть продукти та платформи для експорту</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Platform Selection */}
+              <div>
+                <Label className="text-gray-300 text-sm font-medium">Платформи для експорту</Label>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="prom"
+                      checked={selectedPlatforms.includes("prom")}
+                      onCheckedChange={(checked) => handlePlatformSelect("prom", checked as boolean)}
+                      disabled={!integrations.prom.connected}
+                    />
+                    <Label htmlFor="prom" className="text-gray-300 cursor-pointer">
+                      Prom.ua
+                    </Label>
+                    {!integrations.prom.connected && (
+                      <Badge variant="outline" className="border-red-500/30 text-red-400 text-xs">
+                        Не підключено
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="rozetka"
+                      checked={selectedPlatforms.includes("rozetka")}
+                      onCheckedChange={(checked) => handlePlatformSelect("rozetka", checked as boolean)}
+                      disabled={!integrations.rozetka.connected}
+                    />
+                    <Label htmlFor="rozetka" className="text-gray-300 cursor-pointer">
+                      Rozetka
+                    </Label>
+                    {!integrations.rozetka.connected && (
+                      <Badge variant="outline" className="border-red-500/30 text-red-400 text-xs">
+                        Не підключено
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
-            )}
 
-            <div className="flex space-x-3">
+              {/* Export Actions */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={handleExport}
+                  disabled={selectedProducts.length === 0 || selectedPlatforms.length === 0 || isExporting}
+                  className="cosmic-glow"
+                >
+                  {isExporting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Експортування...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Експортувати вибрані ({selectedProducts.length})
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedProducts(filteredProducts.map((p) => p.id))
+                    setSelectedPlatforms(
+                      ["prom", "rozetka"].filter((p) => integrations[p as keyof typeof integrations].connected),
+                    )
+                  }}
+                  disabled={isExporting}
+                  className="bg-transparent border-slate-600 hover:bg-slate-700"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Швидкий експорт всіх
+                </Button>
+              </div>
+
+              {selectedProducts.length > 0 && selectedPlatforms.length > 0 && (
+                <Alert className="border-blue-500/50 bg-blue-500/10">
+                  <AlertCircle className="h-4 w-4 text-blue-400" />
+                  <AlertDescription className="text-blue-400">
+                    Буде експортовано {selectedProducts.length} продуктів на {selectedPlatforms.length} платформ(и)
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Products Management */}
+          <Tabs defaultValue="products" className="space-y-6">
+            <TabsList className="bg-slate-800 border-slate-700">
+              <TabsTrigger value="products" className="data-[state=active]:bg-slate-700">
+                <Package className="w-4 h-4 mr-2" />
+                Продукти
+              </TabsTrigger>
+              <TabsTrigger value="history" className="data-[state=active]:bg-slate-700">
+                <Clock className="w-4 h-4 mr-2" />
+                Історія експорту
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="products" className="space-y-6">
+              {/* Filters */}
+              <Card className="space-gradient border-slate-700">
+                <CardContent className="p-6">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Пошук за назвою або SKU..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 bg-slate-800 border-slate-600 text-white"
+                      />
+                    </div>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="w-full sm:w-48 bg-slate-800 border-slate-600 text-white">
+                        <SelectValue placeholder="Категорія" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        <SelectItem value="all">Всі категорії</SelectItem>
+                        <SelectItem value="Смартфони">Смартфони</SelectItem>
+                        <SelectItem value="Ноутбуки">Ноутбуки</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full sm:w-48 bg-slate-800 border-slate-600 text-white">
+                        <SelectValue placeholder="Статус" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        <SelectItem value="all">Всі статуси</SelectItem>
+                        <SelectItem value="active">Активні</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Products List */}
+              <Card className="space-gradient border-slate-700">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white">Продукти для експорту</CardTitle>
+                    <CardDescription>Виберіть продукти для експорту на зовнішні платформи</CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="select-all"
+                      checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                    <Label htmlFor="select-all" className="text-gray-300 cursor-pointer">
+                      Вибрати всі
+                    </Label>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {filteredProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg border border-slate-600/50 hover:bg-slate-700/50 transition-colors"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <Checkbox
+                            id={product.id}
+                            checked={selectedProducts.includes(product.id)}
+                            onCheckedChange={(checked) => handleProductSelect(product.id, checked as boolean)}
+                          />
+                          <img
+                            src={product.image || "/placeholder.svg"}
+                            alt={product.name}
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                          <div>
+                            <h3 className="text-white font-medium">{product.name}</h3>
+                            <p className="text-sm text-gray-400">{product.sku}</p>
+                            <p className="text-sm text-gray-400">₴{product.price.toLocaleString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <div className="text-right space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-400">Prom:</span>
+                              <Badge className={`text-xs ${getStatusColor(product.promStatus)}`}>
+                                {getStatusIcon(product.promStatus)}
+                                <span className="ml-1">{getStatusText(product.promStatus)}</span>
+                              </Badge>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-400">Rozetka:</span>
+                              <Badge className={`text-xs ${getStatusColor(product.rozetkaStatus)}`}>
+                                {getStatusIcon(product.rozetkaStatus)}
+                                <span className="ml-1">{getStatusText(product.rozetkaStatus)}</span>
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="hover:bg-slate-600">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="history" className="space-y-6">
+              {/* Export Jobs */}
+              <Card className="space-gradient border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Історія експорту</CardTitle>
+                  <CardDescription>Відстежуйте статус ваших експортів</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {exportJobs.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-400">Немає історії експорту</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {exportJobs.map((job) => (
+                        <div key={job.id} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/50">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <div
+                                className={`w-3 h-3 rounded-full ${
+                                  job.status === "completed"
+                                    ? "bg-green-400"
+                                    : job.status === "failed"
+                                      ? "bg-red-400"
+                                      : job.status === "running"
+                                        ? "bg-blue-400"
+                                        : "bg-yellow-400"
+                                }`}
+                              />
+                              <span className="text-white font-medium">
+                                {job.platform === "prom" ? "Prom.ua" : "Rozetka"}
+                              </span>
+                              <Badge className={getStatusColor(job.status)}>{getStatusText(job.status)}</Badge>
+                            </div>
+                            <span className="text-sm text-gray-400">
+                              {new Date(job.startedAt).toLocaleString("uk-UA")}
+                            </span>
+                          </div>
+
+                          {job.status === "running" && (
+                            <div className="mb-3">
+                              <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Прогрес</span>
+                                <span>{Math.round(job.progress)}%</span>
+                              </div>
+                              <Progress value={job.progress} className="h-2" />
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-400">Всього:</span>
+                              <span className="text-white ml-2">{job.totalProducts}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Успішно:</span>
+                              <span className="text-green-400 ml-2">{job.successCount}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Помилки:</span>
+                              <span className="text-red-400 ml-2">{job.failedCount}</span>
+                            </div>
+                          </div>
+
+                          {job.errors && job.errors.length > 0 && (
+                            <Alert className="mt-3 border-red-500/50 bg-red-500/10">
+                              <XCircle className="h-4 w-4 text-red-400" />
+                              <AlertDescription className="text-red-400">{job.errors.join(", ")}</AlertDescription>
+                            </Alert>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Sidebar - Matching dashboard sidebar */}
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Швидкі дії</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                className="w-full justify-start cosmic-glow"
+                onClick={() => {
+                  setSelectedProducts(filteredProducts.map((p) => p.id))
+                  setSelectedPlatforms(
+                    ["prom", "rozetka"].filter((p) => integrations[p as keyof typeof integrations].connected),
+                  )
+                }}
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Експорт всіх продуктів
+              </Button>
               <Button
                 variant="outline"
-                className="flex-1 bg-transparent border-slate-600"
-                onClick={() => setShowPaymentModal(false)}
-                disabled={isProcessing}
+                className="w-full justify-start bg-transparent border-slate-600 hover:bg-slate-700"
+                onClick={() => handleConnectPlatform("prom")}
               >
-                Скасувати
+                <Settings className="w-4 h-4 mr-2" />
+                Налаштувати Prom.ua
               </Button>
-              <Button className="flex-1 cosmic-glow" onClick={handlePayment} disabled={isProcessing}>
-                {isProcessing ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                    Обробка...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Оплатити
-                  </>
-                )}
+              <Button
+                variant="outline"
+                className="w-full justify-start bg-transparent border-slate-600 hover:bg-slate-700"
+                onClick={() => handleConnectPlatform("rozetka")}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Налаштувати Rozetka
               </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </CardContent>
+          </Card>
+
+          {/* Export Statistics */}
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Статистика експорту</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Успішність експорту</span>
+                <span className="text-green-400 font-medium">
+                  {Math.round((exportedProducts / totalProducts) * 100)}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Активні інтеграції</span>
+                <span className="text-blue-400 font-medium">
+                  {Object.values(integrations).filter((i) => i.connected).length}/2
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Останній експорт</span>
+                <span className="text-gray-300 text-sm">
+                  {integrations.prom.lastSync
+                    ? new Date(integrations.prom.lastSync).toLocaleDateString("uk-UA")
+                    : "Ніколи"}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Остання активність</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center space-x-3 text-sm">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-gray-300">iPhone 15 Pro експортовано на Prom.ua</span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm">
+                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                <span className="text-gray-300">Samsung Galaxy S24 - помилка експорту</span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span className="text-gray-300">MacBook Air M3 очікує експорту</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Credentials Dialog */}
+      <CredentialsDialog
+        open={showCredentialsDialog}
+        onOpenChange={setShowCredentialsDialog}
+        platform={currentPlatform}
+        onSave={handleSaveCredentials}
+      />
     </div>
+  )
+}
+
+// Credentials Dialog Component
+interface CredentialsDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  platform: "prom" | "rozetka"
+  onSave: (apiKey: string) => void
+}
+
+function CredentialsDialog({ open, onOpenChange, platform, onSave }: CredentialsDialogProps) {
+  const [apiKey, setApiKey] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSave = async () => {
+    if (!apiKey.trim()) return
+
+    setIsLoading(true)
+
+    // Simulate API validation
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    onSave(apiKey)
+    setApiKey("")
+    setIsLoading(false)
+  }
+
+  const platformInfo = {
+    prom: {
+      name: "Prom.ua",
+      color: "text-orange-400",
+      instructions: "Отримайте API ключ в особистому кабінеті Prom.ua в розділі 'API'",
+    },
+    rozetka: {
+      name: "Rozetka",
+      color: "text-green-400",
+      instructions: "Отримайте API ключ в особистому кабінеті Rozetka в розділі 'Інтеграції'",
+    },
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-slate-800 border-slate-700">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center">
+            <Key className={`w-5 h-5 mr-2 ${platformInfo[platform].color}`} />
+            Підключення до {platformInfo[platform].name}
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">{platformInfo[platform].instructions}</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="api-key" className="text-gray-300">
+              API ключ
+            </Label>
+            <Input
+              id="api-key"
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Введіть ваш API ключ"
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+
+          <Alert className="border-blue-500/50 bg-blue-500/10">
+            <AlertCircle className="h-4 w-4 text-blue-400" />
+            <AlertDescription className="text-blue-400">
+              Ваш API ключ буде збережено в зашифрованому вигляді та використовуватиметься лише для експорту продуктів.
+            </AlertDescription>
+          </Alert>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="bg-transparent border-slate-600 hover:bg-slate-700"
+            >
+              Скасувати
+            </Button>
+            <Button onClick={handleSave} disabled={!apiKey.trim() || isLoading} className="cosmic-glow">
+              {isLoading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Перевірка...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Зберегти
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

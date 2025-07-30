@@ -17,12 +17,8 @@ export default function HomePage() {
             <span className="text-xl font-bold text-white">DropSpace</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
-              Можливості
-            </Link>
-            <Link href="#pricing" className="text-gray-300 hover:text-white transition-colors">
-              Тарифи
-            </Link>
+            
+            
             <Link href="/auth/login" className="text-gray-300 hover:text-white transition-colors">
               Увійти
             </Link>
@@ -34,7 +30,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 pb-2 px-4">
+      <section className="px-4 py-16">
         <div className="container mx-auto text-center">
           <div className="float-animation mb-8">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center pulse-glow">
@@ -48,32 +44,26 @@ export default function HomePage() {
             </span>{" "}
             дропшипінгу
           </h1>
-          <p className="text-xl text-gray-300 mb-6 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Мінімалістична платформа для дропшипперів та постачальників. Керуйте продуктами, замовленнями та
             партнерствами в одному місці.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/register">
               <Button size="lg" className="cosmic-glow">
-                Спробувати безкоштовно
+                {"Спробувати безкоштовно"}
                 <Zap className="ml-2 w-4 h-4" />
               </Button>
             </Link>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-slate-600 text-white hover:bg-slate-800 bg-transparent"
-            >
-              Дивитися демо
-            </Button>
+            
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-12 pb-2 px-4">
+      <section id="features" className="px-4 py-5">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-[28px]">Можливості платформи</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Можливості платформи</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="space-gradient border-slate-700">
               <CardHeader>
@@ -82,7 +72,7 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-white">Управління продуктами</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Додавайте, редагуйте та імпортуйте продукти з РРЦ та Дроп ціною
+                  Додавайте, редагуйте та імпортуйте продукти з RRP та Drop Price
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -106,7 +96,7 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-white">Експорт на маркетплейси</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Експортуйте продукти на Prom, Rozetka та інші платформи
+                  Експортуйте продукти на Prom.ua, Rozetka та інші платформи
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -115,9 +105,9 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-12 pb-10 px-4">
+      <section id="pricing" className="px-4 py-5">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-[28px]">Тарифні плани</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Тарифні плани</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <Card className="space-gradient border-slate-700">
               <CardHeader>
@@ -168,9 +158,9 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-700/50 py-5 px-4">
+      <footer className="border-t border-slate-700/50 px-4 py-5">
         <div className="container mx-auto text-center text-gray-400">
-          <p>&copy; 2025 DropSpace. Всі права захищені.</p>
+          <p>© 2025 DropSpace. Всі права захищені.</p>
         </div>
       </footer>
     </div>
