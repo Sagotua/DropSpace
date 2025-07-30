@@ -96,22 +96,37 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
 
         {/* Right side - Subscription and User Menu */}
         <div className="flex items-center space-x-4">
-          <Badge variant="outline" className={`hidden sm:flex ${getSubscriptionColor(user.subscription)}`}>
-            {user.subscription}
-          </Badge>
+          <div className="relative group">
+            <Badge
+              variant="outline"
+              className={`hidden sm:flex ${getSubscriptionColor(user.subscription)} relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg px-3 py-1.5 font-medium`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <span className="relative z-10 flex items-center gap-1.5">
+                {user.subscription === "Test" && "🧪"}
+                {user.subscription === "Standard" && "⭐"}
+                {user.subscription === "Cosmos" && "🚀"}
+                {user.subscription}
+              </span>
+            </Badge>
+          </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10">
+              <Button
+                variant="ghost"
+                className="relative h-10 w-10 rounded-full hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20"
+              >
+                <Avatar className="h-10 w-10 ring-2 ring-transparent hover:ring-blue-500/50 transition-all duration-300">
                   <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
                     {user.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-slate-800 border-slate-700" align="end" forceMount>
