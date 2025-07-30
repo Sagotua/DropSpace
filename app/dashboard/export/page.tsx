@@ -299,14 +299,12 @@ export default function ExportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center">
-            <Upload className="w-8 h-8 mr-3 text-blue-400" />
+            
             Експорт продуктів
           </h1>
-          <p className="text-gray-400 mt-1">Експортуйте ваші продукти на Prom.ua та Rozetka</p>
+          <p className="text-gray-400 mt-0">Експортуйте ваші продукти на Prom.ua та Rozetka</p>
         </div>
-        <Badge variant="outline" className="border-blue-500/30 text-blue-400">
-          {currentRole === "dropshipper" ? "Дропшиппер" : "Постачальник"}
-        </Badge>
+        
       </div>
 
       {/* Stats Cards - Matching main dashboard grid */}
