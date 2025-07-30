@@ -30,7 +30,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="px-4 py-16">
+      <section className="px-4 py-16 pb-5">
         <div className="container mx-auto text-center">
           <div className="float-animation mb-8">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center pulse-glow">
@@ -44,11 +44,11 @@ export default function HomePage() {
             </span>{" "}
             дропшипінгу
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto tracking-tighter mb-5">
             Мінімалістична платформа для дропшипперів та постачальників. Керуйте продуктами, замовленнями та
             партнерствами в одному місці.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center leading-7 sm:flex-row gap-y-0 my-0">
             <Link href="/auth/register">
               <Button size="lg" className="cosmic-glow">
                 {"Спробувати безкоштовно"}
@@ -63,7 +63,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section id="features" className="px-4 py-5">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Можливості платформи</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-8">Можливості платформи</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="space-gradient border-slate-700">
               <CardHeader>
@@ -72,7 +72,7 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-white">Управління продуктами</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Додавайте, редагуйте та імпортуйте продукти з RRP та Drop Price
+                  Додавайте, редагуйте та імпортуйте продукти з РРЦ та Дроп ціною
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -105,9 +105,9 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="px-4 py-5">
+      <section id="pricing" className="py-20 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Тарифні плани</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-8">Тарифні плани</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <Card className="space-gradient border-slate-700">
               <CardHeader>
