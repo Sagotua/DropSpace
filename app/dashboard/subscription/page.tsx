@@ -151,18 +151,31 @@ export default function SubscriptionPage() {
       {/* Current Subscription Status */}
       {currentSubscription && (
         <Card className="space-gradient border-slate-700 max-w-2xl mx-auto">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-white" />
+          <CardContent className="p-8 relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-500/10 to-pink-600/10 rounded-full blur-xl"></div>
+
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <CreditCard className="w-8 h-8 text-white" />
+                  </div>
+                  {/* Pulse ring effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl animate-ping opacity-20"></div>
                 </div>
-                <div>
-                  <h3 className="text-white font-medium">Поточна підписка: {currentSubscription}</h3>
-                  <p className="text-sm text-gray-400">
-                    {currentSubscription === "Test"
-                      ? "Тестовий період до 15.02.2024"
-                      : `Наступне списання: ${getNextBillingDate()}`}
+                <div className="space-y-1">
+                  <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Поточна підписка: {currentSubscription}
+                  </h3>
+                  <p className="text-sm text-gray-300 flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>
+                      {currentSubscription === "Test"
+                        ? "Тестовий період до 15.02.2024"
+                        : `Наступне списання: ${getNextBillingDate()}`}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -171,7 +184,7 @@ export default function SubscriptionPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleCancelSubscription}
-                  className="bg-transparent border-red-500 text-red-400 hover:bg-red-500/10"
+                  className="bg-transparent border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-400 transition-all duration-300 backdrop-blur-sm"
                 >
                   Скасувати
                 </Button>
