@@ -95,9 +95,11 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md space-gradient border-slate-700">
         <CardHeader className="text-center">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mx-auto flex items-center justify-center mb-4">
-            <Rocket className="w-6 h-6 text-white" />
-          </div>
+          <Link href="/" className="inline-block">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mx-auto flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform duration-300">
+              <Rocket className="w-6 h-6 text-white" />
+            </div>
+          </Link>
           <CardTitle className="text-white text-2xl">Реєстрація в DropSpace</CardTitle>
           <CardDescription className="text-gray-400">Створіть акаунт для початку роботи</CardDescription>
         </CardHeader>
