@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Rocket, Users, Package, TrendingUp, Star, Zap } from "lucide-react"
+import { Rocket, Users, Package, TrendingUp, Star } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -17,11 +17,21 @@ export default function HomePage() {
             <span className="text-xl font-bold text-white">DropSpace</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/auth/login" className="text-gray-300 hover:text-white transition-colors">
-              Увійти
+            <Link href="/auth/login">
+              <Button
+                variant="ghost"
+                className="text-gray-300 hover:text-white hover:bg-slate-800/50 transition-all duration-300 hover:scale-105 relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span className="relative z-10">Увійти</span>
+              </Button>
             </Link>
             <Link href="/auth/register">
-              <Button className="cosmic-glow">Почати</Button>
+              <Button className="cosmic-glow relative overflow-hidden group hover:scale-105 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <span className="relative z-10 font-semibold">Почати</span>
+              </Button>
             </Link>
           </nav>
         </div>
@@ -48,9 +58,13 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col justify-center leading-7 sm:flex-row gap-y-0 my-0">
             <Link href="/auth/register">
-              <Button size="lg" className="cosmic-glow">
-                {"Спробувати безкоштовно"}
-                <Zap className="ml-2 w-4 h-4" />
+              <Button
+                size="lg"
+                className="cosmic-glow relative overflow-hidden group hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/50"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <span className="relative z-10 font-semibold tracking-wide">Спробувати безкоштовно</span>
               </Button>
             </Link>
           </div>
