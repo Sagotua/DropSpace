@@ -153,7 +153,7 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
                         <span className="text-xs text-gray-400">
                           {currentRole === "dropshipper" ? "Дропшиппер" : "Постачальник"}
                         </span>
-                        <Switch checked={currentRole === "supplier"} onCheckedChange={handleRoleSwitch} size="sm" />
+                        <Switch checked={currentRole === "supplier"} onCheckedChange={handleRoleSwitch} />
                       </div>
                     </div>
                   </div>
