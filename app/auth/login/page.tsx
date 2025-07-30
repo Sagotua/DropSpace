@@ -89,22 +89,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
         <Card className="space-gradient border-slate-700">
-          <CardHeader className="text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-t-lg"></div>
-            <div className="relative z-10">
-              <Link href="/" className="inline-block group">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mx-auto flex items-center justify-center mb-6 cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 border border-blue-400/30 hover:border-blue-300/50">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-xl"></div>
-                  <Rocket className="w-8 h-8 text-white relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-                </div>
-              </Link>
-              <CardTitle className="text-white text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Вхід в DropSpace
-              </CardTitle>
-              <CardDescription className="text-gray-400 text-base">
-                Увійдіть до вашого акаунту та почніть свою космічну подорож
-              </CardDescription>
-            </div>
+          <CardHeader className="text-center">
+            <Link href="/" className="inline-block">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mx-auto flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform duration-200">
+                <Rocket className="w-6 h-6 text-white" />
+              </div>
+            </Link>
+            <CardTitle className="text-white text-2xl">Вхід в DropSpace</CardTitle>
+            <CardDescription className="text-gray-400">Увійдіть до вашого акаунту</CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -185,19 +177,11 @@ export default function LoginPage() {
 
         {/* Demo accounts */}
         <Card className="space-gradient border-slate-700">
-          <CardHeader className="text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-t-lg"></div>
-            <div className="relative z-10 flex flex-col items-center space-y-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg flex items-center justify-center border border-slate-600/50 mb-2">
-                <span className="text-xl">🧪</span>
-              </div>
-              <CardTitle className="text-white text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Демо акаунти для тестування
-              </CardTitle>
-              <CardDescription className="text-gray-400 text-sm max-w-xs">
-                Використайте ці акаунти для швидкого тестування платформи
-              </CardDescription>
-            </div>
+          <CardHeader>
+            <CardTitle className="text-white text-lg">Демо акаунти для тестування</CardTitle>
+            <CardDescription className="text-gray-400">
+              Використайте ці акаунти для швидкого тестування платформи
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {demoAccounts.map((account, index) => (
