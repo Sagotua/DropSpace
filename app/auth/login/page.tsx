@@ -140,15 +140,25 @@ export default function LoginPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full cosmic-glow" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Входимо...
-                  </>
-                ) : (
-                  "Увійти"
-                )}
+              <Button
+                type="submit"
+                className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 hover:from-blue-700 hover:via-purple-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 ease-out border border-blue-500/30 hover:border-blue-400/50"
+                disabled={isLoading}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
+                <span className="relative z-10 flex items-center justify-center">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Входимо...
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">🚀</span>
+                      Увійти
+                    </>
+                  )}
+                </span>
               </Button>
             </form>
 
