@@ -145,7 +145,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
+      <section id="pricing" className="py-20 px-4 pb-14 pt-14">
         <div className="container mx-auto relative">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
           <div className="relative">
