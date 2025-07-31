@@ -74,15 +74,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Get registered users from localStorage
-      const registeredUsers = JSON.parse(localStorage.getItem("dropspace_registered_users") || "[]")
+      const registeredUsersString = localStorage.getItem("dropspace_registered_users")
+      console.log("Registered users string:", registeredUsersString)
+
+      const registeredUsers = JSON.parse(registeredUsersString || "[]")
+      console.log("Parsed registered users:", registeredUsers)
+      console.log("Looking for user with email:", email, "and password:", password)
 
       // Find user with matching email and password
-      const foundUser = registeredUsers.find((u: any) => u.email === email && u.password === password)
+      const foundUser = registeredUsers.find((u: any) => {
+        console.log("Checking user:", u.email, u.password)
+        return u.email === email && u.password === password
+      })
+
+      console.log("Found user:", foundUser)
 
       if (foundUser) {
         const userWithSubscription = {
           ...foundUser,
-          subscription: "Standard", // Default subscription
+          subscription: foundUser.subscription || "Standard",
         }
 
         setUser(userWithSubscription)
@@ -90,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false)
         return true
       } else {
+        console.log("User not found")
         setIsLoading(false)
         return false
       }

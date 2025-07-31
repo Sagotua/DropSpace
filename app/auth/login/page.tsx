@@ -37,9 +37,9 @@ export default function LoginPage() {
     setSuccess("")
 
     try {
-      const success = await login(formData.email, formData.password)
+      const loginSuccess = await login(formData.email, formData.password)
 
-      if (success) {
+      if (loginSuccess) {
         setSuccess("Успішний вхід! Перенаправляємо в панель управління...")
         setTimeout(() => {
           router.push("/dashboard")
@@ -48,6 +48,7 @@ export default function LoginPage() {
         setError("Невірний email або пароль")
       }
     } catch (error) {
+      console.error("Login error:", error)
       setError("Помилка при вході. Спробуйте ще раз.")
     }
   }
@@ -65,17 +66,19 @@ export default function LoginPage() {
     setSuccess("")
 
     try {
-      const success = await login(email, password)
+      console.log("Attempting demo login with:", email, password)
+      const loginSuccess = await login(email, password)
 
-      if (success) {
+      if (loginSuccess) {
         setSuccess("Успішний вхід! Перенаправляємо в панель управління...")
         setTimeout(() => {
           router.push("/dashboard")
         }, 1500)
       } else {
-        setError("Помилка при вході з демо акаунтом")
+        setError("Помилка при вході з демо акаунтом. Перевірте консоль для деталей.")
       }
     } catch (error) {
+      console.error("Demo login error:", error)
       setError("Помилка при вході. Спробуйте ще раз.")
     }
   }

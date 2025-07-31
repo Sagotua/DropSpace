@@ -43,9 +43,8 @@ export const demoUsers = [
 
 export function initializeDemoData() {
   if (typeof window !== "undefined") {
-    const existingUsers = localStorage.getItem("dropspace_registered_users")
-    if (!existingUsers) {
-      localStorage.setItem("dropspace_registered_users", JSON.stringify(demoUsers))
-    }
+    // Always reinitialize demo data to ensure it's correct
+    localStorage.setItem("dropspace_registered_users", JSON.stringify(demoUsers))
+    console.log("Demo data initialized:", demoUsers)
   }
 }
