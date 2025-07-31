@@ -382,6 +382,38 @@ export default function SettingsPage() {
               </Card>
             </div>
           </div>
+
+          {/* Account Info - only in Profile tab */}
+          <Card className="space-gradient border-slate-700 max-w-2xl mt-6">
+            <CardHeader>
+              <CardTitle className="text-white">Інформація про акаунт</CardTitle>
+              <CardDescription className="text-gray-400">Деталі вашого акаунту</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <Label className="text-gray-400">ID користувача:</Label>
+                  <p className="text-white font-mono">{user.id}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Дата реєстрації:</Label>
+                  <p className="text-white">{new Date(user.createdAt).toLocaleDateString("uk-UA")}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Поточна підписка:</Label>
+                  <Badge variant="outline" className="border-blue-500 text-blue-400 ml-2">
+                    {user.subscription}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Статус акаунту:</Label>
+                  <Badge variant="outline" className="border-green-500 text-green-400 ml-2">
+                    Активний
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Password Tab */}
@@ -609,38 +641,6 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Account Info */}
-      <Card className="space-gradient border-slate-700 max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-white">Інформація про акаунт</CardTitle>
-          <CardDescription className="text-gray-400">Деталі вашого акаунту</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <Label className="text-gray-400">ID користувача:</Label>
-              <p className="text-white font-mono">{user.id}</p>
-            </div>
-            <div>
-              <Label className="text-gray-400">Дата реєстрації:</Label>
-              <p className="text-white">{new Date(user.createdAt).toLocaleDateString("uk-UA")}</p>
-            </div>
-            <div>
-              <Label className="text-gray-400">Поточна підписка:</Label>
-              <Badge variant="outline" className="border-blue-500 text-blue-400 ml-2">
-                {user.subscription}
-              </Badge>
-            </div>
-            <div>
-              <Label className="text-gray-400">Статус акаунту:</Label>
-              <Badge variant="outline" className="border-green-500 text-green-400 ml-2">
-                Активний
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

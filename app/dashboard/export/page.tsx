@@ -959,7 +959,7 @@ function CredentialsDialog({ open, onOpenChange, platform, onSave }: Credentials
           <Alert className="border-blue-500/50 bg-blue-500/10">
             <AlertCircle className="h-4 w-4 text-blue-400" />
             <AlertDescription className="text-blue-400">
-              Ваш API ключ буде збережено в зашифрованому вигляді та використовуватиметься лише для експорту продуктів.
+              Ваш API ключ буде збережено в зашифрованому ви��ляді та використовуватиметься лише для експорту продуктів.
             </AlertDescription>
           </Alert>
 

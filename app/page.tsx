@@ -204,8 +204,9 @@ export default function HomePage() {
                   <CardHeader className="relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div className="relative">
-                      <CardTitle className="text-white group-hover:text-blue-300 transition-colors duration-300">
+                      <CardTitle className="text-white flex items-center group-hover:text-blue-300 transition-colors duration-300">
                         Standard
+                        <Star className="ml-2 w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
                       </CardTitle>
                       <CardDescription className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                         Для малого бізнесу
