@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Rocket, User, Package, Menu, Settings, LogOut, CreditCard } from "lucide-react"
+import { Rocket, User, Package, Menu, Settings, LogOut, CreditCard, Star } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRole } from "@/contexts/role-context"
 import Link from "next/link"
@@ -102,9 +102,9 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               <span className="relative z-10 flex items-center gap-2">
                 <span className="text-lg">
-                  {user.subscription === "Test" && "🧪"}
-                  {user.subscription === "Standard" && "⭐"}
-                  {user.subscription === "Cosmos" && "🚀"}
+                  {user.subscription === "Test" && <Star className="w-4 h-4 text-gray-400" />}
+                  {user.subscription === "Standard" && <Star className="w-4 h-4 text-blue-400" />}
+                  {user.subscription === "Cosmos" && <Star className="w-4 h-4 text-yellow-400" />}
                 </span>
                 <span className="font-semibold">{user.subscription}</span>
                 {user.subscription === "Cosmos" && (
