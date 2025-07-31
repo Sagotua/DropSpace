@@ -310,35 +310,44 @@ export default function SubscriptionPage() {
             Детальне порівняння всіх планів підписки
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-3 text-gray-300">Можливості</th>
-                  <th className="text-center py-3 text-gray-300">Test</th>
-                  <th className="text-center py-3 text-gray-300">Standard</th>
-                  <th className="text-center py-3 text-gray-300">Cosmos</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {[
-                  { feature: "Кількість продуктів", test: "50", standard: "1,000", cosmos: "Необмежено" },
-                  { feature: "Замовлення на місяць", test: "10", standard: "Необмежено", cosmos: "Необмежено" },
-                  { feature: "Аналітика", test: "Базова", standard: "Розширена", cosmos: "Преміум" },
-                  { feature: "Підтримка", test: "Email", standard: "Пріоритетна", cosmos: "24/7" },
-                  { feature: "API доступ", test: "❌", standard: "✅", cosmos: "✅" },
-                  { feature: "Персональний менеджер", test: "❌", standard: "❌", cosmos: "✅" },
-                ].map((row, index) => (
-                  <tr key={index} className="border-b border-slate-800">
-                    <td className="py-3 text-gray-300">{row.feature}</td>
-                    <td className="py-3 text-center text-gray-400">{row.test}</td>
-                    <td className="py-3 text-center text-gray-300">{row.standard}</td>
-                    <td className="py-3 text-center text-white">{row.cosmos}</td>
+        <CardContent className="p-8 relative overflow-hidden">
+          {/* Background decorative elements */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-purple-600/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-500/5 to-pink-600/5 rounded-full blur-2xl"></div>
+
+          <div className="relative z-10">
+            <div className="overflow-x-auto rounded-xl border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-700/50 bg-gradient-to-r from-slate-800/30 to-slate-700/30">
+                    <th className="text-left py-4 px-6 text-gray-200 font-semibold">Можливості</th>
+                    <th className="text-center py-4 px-4 text-gray-200 font-semibold">Test</th>
+                    <th className="text-center py-4 px-4 text-gray-200 font-semibold">Standard</th>
+                    <th className="text-center py-4 px-4 text-gray-200 font-semibold">Cosmos</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-sm">
+                  {[
+                    { feature: "Кількість продуктів", test: "50", standard: "1,000", cosmos: "Необмежено" },
+                    { feature: "Замовлення на місяць", test: "10", standard: "Необмежено", cosmos: "Необмежено" },
+                    { feature: "Аналітика", test: "Базова", standard: "Розширена", cosmos: "Преміум" },
+                    { feature: "Підтримка", test: "Email", standard: "Пріоритетна", cosmos: "24/7" },
+                    { feature: "API доступ", test: "❌", standard: "✅", cosmos: "✅" },
+                    { feature: "Персональний менеджер", test: "❌", standard: "❌", cosmos: "✅" },
+                  ].map((row, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-slate-800/50 hover:bg-slate-700/20 transition-colors duration-200"
+                    >
+                      <td className="py-4 px-6 text-gray-200 font-medium">{row.feature}</td>
+                      <td className="py-4 px-4 text-center text-gray-400">{row.test}</td>
+                      <td className="py-4 px-4 text-center text-blue-300">{row.standard}</td>
+                      <td className="py-4 px-4 text-center text-yellow-300 font-medium">{row.cosmos}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -348,8 +357,12 @@ export default function SubscriptionPage() {
         <CardHeader>
           <CardTitle className="text-white text-center">Часті питання</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
+        <CardContent className="p-8 relative overflow-hidden">
+          {/* Background decorative elements */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-green-500/5 to-blue-600/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-purple-500/5 to-pink-600/5 rounded-full blur-2xl"></div>
+
+          <div className="relative z-10 space-y-6">
             {[
               {
                 question: "Чи можу я змінити план в будь-який час?",
@@ -370,9 +383,19 @@ export default function SubscriptionPage() {
                   "Так, ви можете скасувати підписку в будь-який час. Доступ до платних функцій збережеться до кінця оплаченого періоду.",
               },
             ].map((faq, index) => (
-              <div key={index} className="space-y-2">
-                <h4 className="text-white font-medium">{faq.question}</h4>
-                <p className="text-gray-400 text-sm">{faq.answer}</p>
+              <div
+                key={index}
+                className="p-6 rounded-xl bg-gradient-to-r from-slate-800/30 to-slate-700/20 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/10"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-white text-sm font-bold">?</span>
+                  </div>
+                  <div className="space-y-3 flex-1">
+                    <h4 className="text-white font-semibold text-lg leading-relaxed">{faq.question}</h4>
+                    <p className="text-gray-300 text-sm leading-relaxed">{faq.answer}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
