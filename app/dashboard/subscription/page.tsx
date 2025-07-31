@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CreditCard, Check, Star, AlertCircle, Crown, Shield, TrendingUp, Clock } from "lucide-react"
+import { CreditCard, Check, Star, AlertCircle, TrendingUp, Clock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 const subscriptionPlans = [
@@ -47,7 +47,7 @@ const subscriptionPlans = [
     buttonText: "Обрати план",
     buttonVariant: "default" as const,
     popular: true,
-    icon: Shield,
+    icon: Star,
     color: "text-blue-400",
     bgGradient: "from-blue-500/20 to-purple-600/20",
   },
@@ -71,7 +71,7 @@ const subscriptionPlans = [
     buttonText: "Обрати план",
     buttonVariant: "outline" as const,
     popular: false,
-    icon: Crown,
+    icon: Star,
     color: "text-yellow-400",
     bgGradient: "from-yellow-500/20 to-orange-600/20",
   },
@@ -259,7 +259,6 @@ export default function SubscriptionPage() {
                         <PlanIcon
                           className={`w-10 h-10 ${plan.color} transition-all duration-500 group-hover:scale-110`}
                         />
-                        {plan.name === "Cosmos" && <Star className="w-5 h-5 text-yellow-400 ml-1 animate-spin" />}
                       </div>
 
                       <CardTitle className="text-white text-2xl flex items-center justify-center space-x-2 mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">

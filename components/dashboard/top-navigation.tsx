@@ -38,16 +38,8 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
   const { currentRole, switchRole, canSwitchRoles } = useRole()
 
   const getSubscriptionColor = useCallback((plan: string) => {
-    switch (plan) {
-      case "Test":
-        return "border-gray-500 text-gray-400"
-      case "Standard":
-        return "border-blue-500 text-blue-400"
-      case "Cosmos":
-        return "border-purple-500 text-purple-400"
-      default:
-        return "border-gray-500 text-gray-400"
-    }
+    // This function is now simplified since we handle colors directly in the Badge
+    return ""
   }, [])
 
   const handleRoleSwitch = useCallback(
@@ -99,14 +91,25 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
           <div className="relative group">
             <Badge
               variant="outline"
-              className={`hidden sm:flex ${getSubscriptionColor(user.subscription)} relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg px-3 py-1.5 font-medium`}
+              className={`hidden sm:flex relative overflow-hidden transition-all duration-300 hover:scale-105 px-3 py-1.5 font-medium border-2 ${
+                user.subscription === "Test"
+                  ? "border-gray-500/50 text-gray-300 bg-gray-900/50 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-500/20"
+                  : user.subscription === "Standard"
+                    ? "border-blue-500/50 text-blue-300 bg-blue-900/20 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/30"
+                    : "border-amber-500/50 text-amber-300 bg-gradient-to-r from-amber-900/20 to-yellow-900/20 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/30"
+              }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <span className="relative z-10 flex items-center gap-1.5">
-                {user.subscription === "Test" && "🧪"}
-                {user.subscription === "Standard" && "⭐"}
-                {user.subscription === "Cosmos" && "🚀"}
-                {user.subscription}
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="text-lg">
+                  {user.subscription === "Test" && "🧪"}
+                  {user.subscription === "Standard" && "⭐"}
+                  {user.subscription === "Cosmos" && "🚀"}
+                </span>
+                <span className="font-semibold">{user.subscription}</span>
+                {user.subscription === "Cosmos" && (
+                  <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                )}
               </span>
             </Badge>
           </div>
