@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -104,10 +105,12 @@ export default function OrdersPage() {
           <h1 className="text-3xl font-bold text-white">Мої замовлення</h1>
           <p className="text-gray-400">Керуйте вашими замовленнями та відстежуйте їх статус</p>
         </div>
-        <Button className="cosmic-glow">
-          <Plus className="w-4 h-4 mr-2" />
-          Нове замовлення
-        </Button>
+        <Link href="/dashboard/create-order">
+          <Button className="cosmic-glow">
+            <Plus className="w-4 h-4 mr-2" />
+            Нове замовлення
+          </Button>
+        </Link>
       </div>
 
       {/* Filters */}

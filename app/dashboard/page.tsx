@@ -345,7 +345,7 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Recent Orders */}
         <Card className="lg:col-span-2 space-gradient border-slate-700">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <div>
               <CardTitle className="text-white">
                 {currentRole === "dropshipper" ? "Останні замовлення" : "Нові замовлення"}
@@ -356,12 +356,6 @@ export default function DashboardPage() {
                   : "Замовлення від дропшипперів, що потребують обробки"}
               </CardDescription>
             </div>
-            <Link href={currentRole === "dropshipper" ? "/dashboard/create-order" : "/dashboard/supplier-orders"}>
-              <Button size="sm" className="cosmic-glow">
-                <Plus className="w-4 h-4 mr-2" />
-                {currentRole === "dropshipper" ? "Нове замовлення" : "Переглянути всі"}
-              </Button>
-            </Link>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -413,7 +407,7 @@ export default function DashboardPage() {
               <CardTitle className="text-white">Швидкі дії</CardTitle>
               <CardDescription className="text-gray-400">Найчастіші операції</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               {currentRole === "dropshipper" ? (
                 <>
                   <Link href="/dashboard/create-order">

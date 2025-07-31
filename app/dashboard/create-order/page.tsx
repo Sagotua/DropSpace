@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Package, User, MapPin, ShoppingCart } from "lucide-react"
+import { Package, User, MapPin, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 
 // Mock imported products data
@@ -107,17 +107,9 @@ export default function CreateOrderPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Link href="/dashboard">
-          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Назад до панелі
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-white">Створити замовлення</h1>
-          <p className="text-gray-400">Оформіть замовлення для вашого клієнта</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-white">Створити замовлення</h1>
+        <p className="text-gray-400">Оформіть замовлення для вашого клієнта</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
