@@ -195,112 +195,196 @@ export default function SubscriptionPage() {
       )}
 
       {/* Subscription Plans */}
-      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {subscriptionPlans.map((plan) => {
-          const isCurrentPlan = plan.name.toLowerCase() === currentSubscription.toLowerCase()
-          const PlanIcon = plan.icon
+      <div className="relative">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-          return (
-            <Card
-              key={plan.id}
-              className={`space-gradient border-slate-700 relative hover:border-slate-600 transition-all duration-300 ${
-                plan.popular ? "ring-2 ring-blue-500/50" : ""
-              } ${isCurrentPlan ? "ring-2 ring-green-500/50" : ""}`}
-            >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600">
-                  Популярний
-                </Badge>
-              )}
+        <div className="relative z-10 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto p-8 items-stretch">
+          {subscriptionPlans.map((plan, index) => {
+            const isCurrentPlan = plan.name.toLowerCase() === currentSubscription.toLowerCase()
+            const PlanIcon = plan.icon
 
-              {/* Current Plan Badge */}
-              {isCurrentPlan && (
-                <Badge className="absolute -top-3 right-4 bg-green-500 hover:bg-green-600">Поточний план</Badge>
-              )}
-
-              <CardHeader className="text-center pb-4">
+            return (
+              <div
+                key={plan.id}
+                className="group relative flex"
+                style={{
+                  animation: `fadeInUp 0.6s ease-out ${index * 0.2}s both`,
+                }}
+              >
+                {/* Animated background glow */}
                 <div
-                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-4`}
+                  className={`absolute -inset-1 ${
+                    plan.name === "Cosmos"
+                      ? "bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20"
+                      : "bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20"
+                  } rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500`}
+                ></div>
+
+                <Card
+                  className={`space-gradient border-slate-700 relative hover:border-slate-600 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 flex flex-col h-full w-full ${
+                    plan.popular ? "ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20" : ""
+                  } ${isCurrentPlan ? "ring-2 ring-green-500/50 shadow-2xl shadow-green-500/20" : ""} ${
+                    plan.name === "Cosmos"
+                      ? "ring-2 ring-yellow-500/50 shadow-2xl shadow-yellow-500/20 border-yellow-500/30"
+                      : ""
+                  } group-hover:shadow-2xl group-hover:shadow-purple-500/20`}
                 >
-                  <PlanIcon className={`w-8 h-8 ${plan.color}`} />
-                  {plan.name === "Cosmos" && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
-                </div>
-
-                <CardTitle className="text-white text-xl flex items-center justify-center space-x-2">
-                  <span>{plan.name}</span>
-                </CardTitle>
-
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold text-white">
-                    ${plan.price}
-                    <span className="text-lg text-gray-400 font-normal">{plan.period}</span>
-                  </div>
-                  <CardDescription className="text-gray-400">{plan.description}</CardDescription>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                {/* Features List */}
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center space-x-3">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300 text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Action Button */}
-                <Button
-                  className={`w-full ${
-                    plan.buttonVariant === "default"
-                      ? "cosmic-glow"
-                      : "bg-transparent border-slate-600 hover:bg-slate-700"
-                  }`}
-                  variant={plan.buttonVariant}
-                  onClick={() => handlePlanSelect(plan.id)}
-                  disabled={isCurrentPlan || isProcessing}
-                >
-                  {isProcessing && selectedPlan === plan.id ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                      Обробка...
-                    </>
-                  ) : isCurrentPlan ? (
-                    "Поточний план"
-                  ) : (
-                    plan.buttonText
+                  {/* Popular Badge */}
+                  {plan.popular && (
+                    <Badge className="absolute -top-3 left-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 animate-bounce z-10">
+                      <Star className="w-3 h-3 mr-1" />
+                      Популярний
+                    </Badge>
                   )}
-                </Button>
 
-                {/* Upgrade/Downgrade hints */}
-                {!isCurrentPlan && currentSubscription !== "Test" && (
-                  <div className="text-center">
-                    {plan.price >
-                    (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())?.price ||
-                      0) ? (
-                      <p className="text-xs text-blue-400 flex items-center justify-center">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        Покращення плану
-                      </p>
-                    ) : (
-                      plan.price <
-                        (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
-                          ?.price || 0) && (
-                        <p className="text-xs text-yellow-400 flex items-center justify-center">
-                          <AlertCircle className="w-3 h-3 mr-1" />
-                          Зміна плану
-                        </p>
-                      )
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )
-        })}
+                  {/* Current Plan Badge */}
+                  {isCurrentPlan && (
+                    <Badge className="absolute -top-3 right-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 animate-pulse z-10">
+                      <Check className="w-3 h-3 mr-1" />
+                      Поточний план
+                    </Badge>
+                  )}
+
+                  <CardHeader className="text-center pb-4 relative overflow-hidden">
+                    {/* Header background effect */}
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-800/20 to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div className="relative z-10">
+                      <div
+                        className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-6 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg group-hover:shadow-2xl`}
+                      >
+                        <PlanIcon
+                          className={`w-10 h-10 ${plan.color} transition-all duration-500 group-hover:scale-110`}
+                        />
+                        {plan.name === "Cosmos" && <Star className="w-5 h-5 text-yellow-400 ml-1 animate-spin" />}
+                      </div>
+
+                      <CardTitle className="text-white text-2xl flex items-center justify-center space-x-2 mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
+                        <span>{plan.name}</span>
+                      </CardTitle>
+
+                      <div className="space-y-3">
+                        <div className="text-4xl font-bold text-white group-hover:scale-110 transition-transform duration-500">
+                          <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            ${plan.price}
+                          </span>
+                          <span className="text-lg text-gray-400 font-normal">{plan.period}</span>
+                        </div>
+                        <CardDescription className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                          {plan.description}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-6 relative flex-grow flex flex-col">
+                    {/* Features List */}
+                    <ul className="space-y-4 flex-grow">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li
+                          key={featureIndex}
+                          className="flex items-center space-x-3 transform transition-all duration-300 hover:translate-x-2"
+                          style={{
+                            animation: `slideInLeft 0.4s ease-out ${index * 0.2 + featureIndex * 0.1}s both`,
+                          }}
+                        >
+                          <div className="w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-gray-300 text-sm group-hover:text-white transition-colors duration-300">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-auto pt-4 pb-0">
+                      {/* Action Button */}
+                      <Button
+                        className={`w-full transform transition-all duration-500 hover:scale-105 ${
+                          plan.buttonVariant === "default"
+                            ? "cosmic-glow hover:shadow-2xl hover:shadow-blue-500/50"
+                            : "bg-transparent border-slate-600 hover:bg-gradient-to-r hover:from-slate-700 hover:to-slate-600 hover:border-slate-500"
+                        }`}
+                        variant={plan.buttonVariant}
+                        onClick={() => handlePlanSelect(plan.id)}
+                        disabled={isCurrentPlan || isProcessing}
+                      >
+                        {isProcessing && selectedPlan === plan.id ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                            Обробка...
+                          </>
+                        ) : isCurrentPlan ? (
+                          <>
+                            <Check className="w-4 h-4 mr-2" />
+                            Поточний план
+                          </>
+                        ) : (
+                          <>
+                            <span>{plan.buttonText}</span>
+                            <TrendingUp className="w-4 h-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" />
+                          </>
+                        )}
+                      </Button>
+
+                      {/* Upgrade/Downgrade hints */}
+                      {!isCurrentPlan && currentSubscription !== "Test" && (
+                        <div className="text-center transform transition-all duration-300 hover:scale-105 mt-3">
+                          {plan.price >
+                          (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
+                            ?.price || 0) ? (
+                            <p className="text-xs text-blue-400 flex items-center justify-center animate-pulse">
+                              <TrendingUp className="w-3 h-3 mr-1" />
+                              Покращення плану
+                            </p>
+                          ) : (
+                            plan.price <
+                              (subscriptionPlans.find((p) => p.name.toLowerCase() === currentSubscription.toLowerCase())
+                                ?.price || 0) && (
+                              <p className="text-xs text-yellow-400 flex items-center justify-center animate-pulse">
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                Зміна плану
+                              </p>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )
+          })}
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
 
       {/* Features Comparison */}
       <Card className="space-gradient border-slate-700 max-w-4xl mx-auto">
