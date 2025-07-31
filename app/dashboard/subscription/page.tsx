@@ -254,10 +254,22 @@ export default function SubscriptionPage() {
 
                     <div className="relative z-10">
                       <div
-                        className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${plan.bgGradient} flex items-center justify-center mb-6 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg group-hover:shadow-2xl`}
+                        className={`w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-all duration-300 ${
+                          plan.id === "test"
+                            ? "bg-gray-800/50 border-2 border-gray-600/50 hover:border-gray-500"
+                            : plan.id === "standard"
+                              ? "bg-blue-900/30 border-2 border-blue-600/50 hover:border-blue-500"
+                              : "bg-yellow-900/30 border-2 border-yellow-600/50 hover:border-yellow-500"
+                        }`}
                       >
                         <PlanIcon
-                          className={`w-10 h-10 ${plan.color} transition-all duration-500 group-hover:scale-110`}
+                          className={`w-10 h-10 transition-all duration-300 ${
+                            plan.id === "test"
+                              ? "text-gray-400 hover:text-gray-300"
+                              : plan.id === "standard"
+                                ? "text-blue-400 hover:text-blue-300"
+                                : "text-yellow-400 hover:text-yellow-300"
+                          }`}
                         />
                       </div>
 
