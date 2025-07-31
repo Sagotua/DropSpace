@@ -298,13 +298,9 @@ export default function ExportPage() {
       {/* Header - Matching main dashboard style */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center">
-            
-            Експорт продуктів
-          </h1>
+          <h1 className="text-3xl font-bold text-white flex items-center">Експорт продуктів</h1>
           <p className="text-gray-400 mt-0">Експортуйте ваші продукти на Prom.ua та Rozetka</p>
         </div>
-        
       </div>
 
       {/* Stats Cards - Matching main dashboard grid */}
@@ -396,6 +392,7 @@ export default function ExportPage() {
                   </div>
                 </div>
                 <Badge
+                  variant="secondary"
                   className={
                     integrations.prom.connected
                       ? "bg-green-500/20 text-green-400 border-green-500/30"
@@ -452,6 +449,7 @@ export default function ExportPage() {
                   </div>
                 </div>
                 <Badge
+                  variant="secondary"
                   className={
                     integrations.rozetka.connected
                       ? "bg-green-500/20 text-green-400 border-green-500/30"
@@ -685,14 +683,14 @@ export default function ExportPage() {
                           <div className="text-right space-y-1">
                             <div className="flex items-center space-x-2">
                               <span className="text-xs text-gray-400">Prom:</span>
-                              <Badge className={`text-xs ${getStatusColor(product.promStatus)}`}>
+                              <Badge variant="secondary" className={`text-xs ${getStatusColor(product.promStatus)}`}>
                                 {getStatusIcon(product.promStatus)}
                                 <span className="ml-1">{getStatusText(product.promStatus)}</span>
                               </Badge>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className="text-xs text-gray-400">Rozetka:</span>
-                              <Badge className={`text-xs ${getStatusColor(product.rozetkaStatus)}`}>
+                              <Badge variant="secondary" className={`text-xs ${getStatusColor(product.rozetkaStatus)}`}>
                                 {getStatusIcon(product.rozetkaStatus)}
                                 <span className="ml-1">{getStatusText(product.rozetkaStatus)}</span>
                               </Badge>
@@ -742,7 +740,9 @@ export default function ExportPage() {
                               <span className="text-white font-medium">
                                 {job.platform === "prom" ? "Prom.ua" : "Rozetka"}
                               </span>
-                              <Badge className={getStatusColor(job.status)}>{getStatusText(job.status)}</Badge>
+                              <Badge variant="secondary" className={getStatusColor(job.status)}>
+                                {getStatusText(job.status)}
+                              </Badge>
                             </div>
                             <span className="text-sm text-gray-400">
                               {new Date(job.startedAt).toLocaleString("uk-UA")}
@@ -959,7 +959,7 @@ function CredentialsDialog({ open, onOpenChange, platform, onSave }: Credentials
           <Alert className="border-blue-500/50 bg-blue-500/10">
             <AlertCircle className="h-4 w-4 text-blue-400" />
             <AlertDescription className="text-blue-400">
-              Ваш API ключ буде збережено в зашифрованому ви��ляді та використовуватиметься лише для експорту продуктів.
+              Ваш API ключ буде збережено в зашифрованому вигляді та використовуватиметься лише для експорту продуктів.
             </AlertDescription>
           </Alert>
 

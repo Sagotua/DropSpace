@@ -450,7 +450,7 @@ export default function SuppliersPage() {
                       <div>
                         <div className="flex items-center space-x-2">
                           <p className="text-white font-medium">{supplier.name}</p>
-                          <Badge className={`text-xs ${getStatusColor(supplier.status)}`}>
+                          <Badge variant="secondary" className={`text-xs ${getStatusColor(supplier.status)}`}>
                             {getStatusText(supplier.status)}
                           </Badge>
                         </div>

@@ -24,6 +24,7 @@ import {
   Phone,
   Shield,
   Package,
+  Star,
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
@@ -401,8 +402,28 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">Поточна підписка:</Label>
-                  <Badge variant="outline" className="border-blue-500 text-blue-400 ml-2">
-                    {user.subscription}
+                  <Badge
+                    variant="outline"
+                    className={`ml-2 relative overflow-hidden transition-all duration-300 hover:scale-105 px-3 py-1.5 font-medium border-2 ${
+                      user.subscription === "Test"
+                        ? "border-gray-500/50 text-gray-300 bg-gray-900/50 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-500/20"
+                        : user.subscription === "Standard"
+                          ? "border-blue-500/50 text-blue-300 bg-blue-900/20 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/30"
+                          : "border-amber-500/50 text-amber-300 bg-gradient-to-r from-amber-900/20 to-yellow-900/20 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/30"
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <span className="relative z-10 flex items-center gap-2">
+                      <span className="text-lg">
+                        {user.subscription === "Test" && <Star className="w-4 h-4 text-gray-400" />}
+                        {user.subscription === "Standard" && <Star className="w-4 h-4 text-blue-400" />}
+                        {user.subscription === "Cosmos" && <Star className="w-4 h-4 text-yellow-400" />}
+                      </span>
+                      <span className="font-semibold">{user.subscription}</span>
+                      {user.subscription === "Cosmos" && (
+                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                      )}
+                    </span>
                   </Badge>
                 </div>
                 <div>

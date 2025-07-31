@@ -215,7 +215,9 @@ export default function ImportedProductsPage() {
                     <p className="text-sm text-gray-400">{product.sku}</p>
                   </div>
                 </div>
-                <Badge className={`text-xs ${getStatusColor(product.status)}`}>{getStatusText(product.status)}</Badge>
+                <Badge variant="secondary" className={`text-xs ${getStatusColor(product.status)}`}>
+                  {getStatusText(product.status)}
+                </Badge>
               </div>
 
               <div className="space-y-3">

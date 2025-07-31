@@ -109,7 +109,7 @@ export default function SupplierOrdersPage() {
       case "rejected":
         return "bg-red-500/20 text-red-400 border-red-500/30"
       case "shipped":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
@@ -206,7 +206,7 @@ export default function SupplierOrdersPage() {
                 <p className="text-sm text-gray-400">Відправлені</p>
                 <p className="text-2xl font-bold text-white">{ordersByStatus.shipped.length}</p>
               </div>
-              <Truck className="w-8 h-8 text-green-400" />
+              <Truck className="w-8 h-8 text-purple-400" />
             </div>
           </CardContent>
         </Card>
@@ -327,7 +327,7 @@ function OrdersList({
       case "rejected":
         return "bg-red-500/20 text-red-400 border-red-500/30"
       case "shipped":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
@@ -376,7 +376,9 @@ function OrdersList({
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-white font-medium">{order.id}</h3>
-                    <Badge className={`${getStatusColor(order.status)}`}>{getStatusText(order.status)}</Badge>
+                    <Badge variant="secondary" className={getStatusColor(order.status)}>
+                      {getStatusText(order.status)}
+                    </Badge>
                   </div>
                   <p className="text-gray-300 font-medium">{order.product.name}</p>
                   <p className="text-sm text-gray-400">Кількість: {order.quantity}</p>
@@ -424,7 +426,7 @@ function OrdersList({
                 {order.status === "accepted" && (
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-purple-600 hover:bg-purple-700"
                     onClick={() => onStatusUpdate(order.id, "shipped")}
                   >
                     <Truck className="w-4 h-4 mr-2" />
@@ -461,7 +463,7 @@ function OrderDetailsDialog({
       case "rejected":
         return "bg-red-500/20 text-red-400 border-red-500/30"
       case "shipped":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
@@ -488,7 +490,9 @@ function OrderDetailsDialog({
         <DialogHeader>
           <DialogTitle className="text-white flex items-center justify-between">
             Деталі замовлення {order.id}
-            <Badge className={`${getStatusColor(order.status)}`}>{getStatusText(order.status)}</Badge>
+            <Badge variant="secondary" className={getStatusColor(order.status)}>
+              {getStatusText(order.status)}
+            </Badge>
           </DialogTitle>
           <DialogDescription className="text-gray-400">
             Створено: {new Date(order.createdAt).toLocaleDateString("uk-UA")}
@@ -600,7 +604,7 @@ function OrderDetailsDialog({
             )}
             {order.status === "accepted" && (
               <Button
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-purple-600 hover:bg-purple-700"
                 onClick={() => {
                   onStatusUpdate(order.id, "shipped")
                   onClose()

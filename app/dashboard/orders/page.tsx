@@ -58,33 +58,34 @@ export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return (
+          <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+            Виконано
+          </Badge>
+        )
       case "pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+        return (
+          <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+            Очікує
+          </Badge>
+        )
       case "processing":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+        return (
+          <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+            Обробляється
+          </Badge>
+        )
       case "shipped":
-        return "bg-purple-500/20 text-purple-400 border-purple-500/30"
+        return (
+          <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+            Відправлено
+          </Badge>
+        )
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
-    }
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Виконано"
-      case "pending":
-        return "Очікує"
-      case "processing":
-        return "Обробляється"
-      case "shipped":
-        return "Відправлено"
-      default:
-        return status
+        return <Badge variant="secondary">Невідомо</Badge>
     }
   }
 
@@ -176,9 +177,7 @@ export default function OrdersPage() {
                     <TableCell className="text-gray-300">{order.product}</TableCell>
                     <TableCell className="text-gray-300">{order.quantity}</TableCell>
                     <TableCell className="text-white font-medium">{order.amount}</TableCell>
-                    <TableCell>
-                      <Badge className={`${getStatusColor(order.status)}`}>{getStatusText(order.status)}</Badge>
-                    </TableCell>
+                    <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell className="text-gray-300">{order.date}</TableCell>
                     <TableCell className="text-gray-300">{order.supplier}</TableCell>
                     <TableCell>

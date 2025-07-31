@@ -266,17 +266,17 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30"
       case "pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30"
       case "processing":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30"
       case "accepted":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30"
       case "shipped":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30 hover:bg-purple-500/30"
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/30"
     }
   }
 
@@ -390,7 +390,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="text-right space-y-1">
                     <p className="text-white font-medium">{order.amount}</p>
-                    <Badge className={`text-xs ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</Badge>
+                    <Badge variant="secondary" className={`text-xs ${getStatusColor(order.status)}`}>
+                      {getStatusText(order.status)}
+                    </Badge>
                     <p className="text-xs text-gray-500">{order.time}</p>
                   </div>
                 </div>
@@ -512,15 +514,16 @@ export default function DashboardPage() {
                         <div className="text-right">
                           <p className="text-white font-medium">{dropshipper.totalValue}</p>
                           <p className="text-sm text-gray-400">{dropshipper.lastOrder}</p>
-                          <div
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs mt-1 ${
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs mt-1 ${
                               dropshipper.status === "active"
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-blue-500/20 text-blue-400"
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : "bg-blue-500/20 text-blue-400 border-blue-500/30"
                             }`}
                           >
                             {dropshipper.status === "active" ? "Активний" : "Недавно"}
-                          </div>
+                          </Badge>
                         </div>
                       </div>
                     ))}

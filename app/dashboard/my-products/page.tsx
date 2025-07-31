@@ -256,7 +256,9 @@ export default function MyProductsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400 text-sm">Статус:</span>
-                  <Badge className={`text-xs ${getStatusColor(product.status)}`}>{getStatusText(product.status)}</Badge>
+                  <Badge variant="secondary" className={`text-xs ${getStatusColor(product.status)}`}>
+                    {getStatusText(product.status)}
+                  </Badge>
                 </div>
               </div>
             </CardContent>

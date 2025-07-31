@@ -142,19 +142,19 @@ export default function PayoutsPage() {
     switch (status) {
       case "requested":
         return (
-          <Badge className="bg-gradient-to-r from-yellow-500/30 to-orange-500/30 text-yellow-300 border-yellow-400/50 font-medium px-3 py-1">
+          <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
             Прийнято
           </Badge>
         )
       case "processing":
         return (
-          <Badge className="bg-gradient-to-r from-blue-500/30 to-cyan-500/30 text-blue-300 border-blue-400/50 font-medium px-3 py-1">
+          <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
             В процесі
           </Badge>
         )
       case "completed":
         return (
-          <Badge className="bg-gradient-to-r from-green-500/30 to-emerald-500/30 text-green-300 border-green-400/50 font-medium px-3 py-1">
+          <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
             Виконано
           </Badge>
         )
