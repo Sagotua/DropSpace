@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, ShoppingCart, Package, Plus } from "lucide-react"
+import { Search, ShoppingCart, Package } from "lucide-react"
 
 // Mock imported products data
 const importedProducts = [
@@ -112,12 +112,6 @@ export default function ImportedProductsPage() {
           <h1 className="text-3xl font-bold text-white">Імпортовані продукти</h1>
           <p className="text-gray-400">Продукти, доступні для замовлення від ваших постачальників</p>
         </div>
-        <Link href="/dashboard/create-order">
-          <Button className="cosmic-glow">
-            <Plus className="w-4 h-4 mr-2" />
-            Створити замовлення
-          </Button>
-        </Link>
       </div>
 
       {/* Stats */}
