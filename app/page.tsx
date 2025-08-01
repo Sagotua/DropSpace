@@ -268,9 +268,19 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-700/50 px-4 py-5">
-        <div className="container mx-auto text-center text-gray-400">
-          <p>© 2025 DropSpace. Всі права захищені.</p>
+      <footer className="relative border-t border-slate-700/50 px-4 py-5 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5"></div>
+        <div className="container mx-auto text-center relative z-10">
+          <p className="text-gray-400 hover:text-gray-300 transition-colors duration-300 relative group text-sm flex items-center justify-center">
+            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
+              <Rocket className="w-2 h-2 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold mr-2">
+              DropSpace
+            </span>
+            © 2025 Всі права захищені.
+            <span className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded blur-sm"></span>
+          </p>
         </div>
       </footer>
     </div>
