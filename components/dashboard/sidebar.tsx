@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="px-4 pb-4 space-y-2">
+        <nav className="px-4 pb-20 space-y-2 overflow-y-auto flex-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -99,6 +99,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             )
           })}
         </nav>
+
+        {/* What's New Button - Fixed at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700/50 bg-gradient-to-b from-transparent to-slate-900/50">
+          <Link
+            href="/dashboard/whats-new"
+            onClick={onClose}
+            className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-600/10 hover:to-purple-600/10 hover:border hover:border-blue-500/20 hover:shadow-lg hover:shadow-blue-500/5"
+          >
+            <div className="w-5 h-5 mr-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+              <span className="text-white text-xs font-bold">!</span>
+            </div>
+            Нове у DropSpace
+          </Link>
+        </div>
       </div>
     </>
   )
