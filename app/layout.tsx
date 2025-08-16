@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "DropSpace - CRM для дропшипперів та постачальників",
   description: "Мінімалістична, сучасна CRM система для дропшипперів та постачальників",
-    generator: 'v0.dev'
+    generator: 'v0.app'
 }
 
 export default function RootLayout({

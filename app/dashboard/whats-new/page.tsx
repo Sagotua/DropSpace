@@ -1,291 +1,811 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Star, Bug, Zap, Shield, Palette, Eye, Edit, Navigation } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Smartphone,
+  Users,
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Star,
+  Sparkles,
+  Rocket,
+  Target,
+  TrendingUp,
+  Calendar,
+  CheckCircle,
+  ExternalLink,
+  Github,
+  MessageSquare,
+  Heart,
+  Coffee,
+  Code,
+  Palette,
+  Shield,
+  Database,
+  Globe,
+  Search,
+  Filter,
+  Edit,
+  RefreshCw,
+  Bell,
+  Lock,
+  User,
+  CreditCard,
+  Grid,
+  Layout,
+  MousePointer,
+  Accessibility,
+  Gauge,
+} from "lucide-react"
 
-const patchNotes = [
+interface PatchNote {
+  version: string
+  date: string
+  type: "major" | "minor" | "patch"
+  title: string
+  description: string
+  features: {
+    icon: any
+    title: string
+    description: string
+    status: "new" | "improved" | "fixed"
+  }[]
+  stats?: {
+    label: string
+    value: string
+    change: string
+    trend: "up" | "down" | "stable"
+  }[]
+  technical?: {
+    title: string
+    items: string[]
+  }[]
+}
+
+const patchNotes: PatchNote[] = [
   {
-    version: "2.3.0",
+    version: "2.4.0",
     date: "16 січня 2025",
-    type: "major",
-    title: "Система патч-нотів та покращення навігації",
-    changes: [
-      "Додано нову кнопку 'Нове у DropSpace' в сайдбар для всіх ролей користувачів",
-      "Створено повноцінну сторінку патч-нотів з адаптивним дизайном",
-      "Реалізовано кольорове кодування для різних типів оновлень",
-      "Додано анімації та ефекти наведення для кращого UX",
-      "Інтегровано систему версіонування з детальними описами змін",
+    type: "minor",
+    title: "Мобільна оптимізація",
+    description:
+      "Повна адаптація платформи для мобільних пристроїв з покращеною зручністю використання та доступністю.",
+    features: [
+      {
+        icon: Smartphone,
+        title: "Адаптивний дизайн",
+        description: "Повністю адаптивний інтерфейс для всіх розмірів екранів від 320px до 768px",
+        status: "new",
+      },
+      {
+        icon: MousePointer,
+        title: "Touch-friendly елементи",
+        description: "Всі інтерактивні елементи мають мінімальний розмір 44×44px для зручного використання",
+        status: "improved",
+      },
+      {
+        icon: Layout,
+        title: "Мобільні картки",
+        description: "Таблиці замінено на картки для кращого відображення на мобільних пристроях",
+        status: "new",
+      },
+      {
+        icon: Grid,
+        title: "Респонсивні сітки",
+        description: "Статистичні картки та продукти адаптуються під розмір екрану",
+        status: "improved",
+      },
+      {
+        icon: Accessibility,
+        title: "Покращена доступність",
+        description: "Контрастність 4.5:1, підтримка скрін-рідерів та клавіатурної навігації",
+        status: "improved",
+      },
+      {
+        icon: Gauge,
+        title: "Оптимізована продуктивність",
+        description: "CSS-only респонсивний дизайн без JavaScript для кращої швидкості",
+        status: "improved",
+      },
+    ],
+    stats: [
+      {
+        label: "Підтримувані пристрої",
+        value: "100%",
+        change: "+25%",
+        trend: "up",
+      },
+      {
+        label: "Мобільна швидкість",
+        value: "95/100",
+        change: "+20",
+        trend: "up",
+      },
+      {
+        label: "Touch targets",
+        value: "44px+",
+        change: "Стандарт",
+        trend: "stable",
+      },
+      {
+        label: "Доступність",
+        value: "AA",
+        change: "WCAG 2.1",
+        trend: "up",
+      },
+    ],
+    technical: [
+      {
+        title: "Респонсивні брейкпоінти",
+        items: [
+          "≤375px: Екстра малі пристрої (iPhone SE)",
+          "≤640px: Малі пристрої (мобільні телефони)",
+          "≤768px: Середні пристрої (планшети)",
+          "≥1024px: Десктоп (без змін)",
+        ],
+      },
+      {
+        title: "Оптимізовані сторінки",
+        items: [
+          "/dashboard/orders - Картки замість таблиць",
+          "/dashboard/my-products - 2-колонкова сітка статистики",
+          "/dashboard/settings - Одноколонкові форми та стислі вкладки",
+        ],
+      },
+      {
+        title: "Технічна реалізація",
+        items: [
+          "Tailwind responsive utilities (sm:, lg:)",
+          "CSS-only адаптація без JavaScript",
+          "Збережено всі десктопні макети",
+          "Мінімальні touch targets 44px",
+        ],
+      },
     ],
   },
   {
-    version: "2.2.5",
-    date: "16 січня 2025",
+    version: "2.3.1",
+    date: "15 січня 2025",
+    type: "patch",
+    title: "Покращення навігації",
+    description: "Оптимізація бічної панелі та додавання кнопки 'Нове у DropSpace' для відстеження оновлень.",
+    features: [
+      {
+        icon: Bell,
+        title: "Кнопка 'Нове у DropSpace'",
+        description: "Нова кнопка внизу бічної панелі для швидкого доступу до патч-нотів",
+        status: "new",
+      },
+      {
+        icon: Layout,
+        title: "Покращена навігація",
+        description: "Оптимізовано розташування елементів у бічній панелі",
+        status: "improved",
+      },
+      {
+        icon: Sparkles,
+        title: "Візуальні ефекти",
+        description: "Додано hover-ефекти та анімації для кращого UX",
+        status: "improved",
+      },
+    ],
+  },
+  {
+    version: "2.3.0",
+    date: "14 січня 2025",
     type: "minor",
-    title: "Функціональність замовлень для дропшипперів",
-    changes: [
-      "Додано модальне вікно для перегляду деталей замовлення з повною інформацією про клієнта",
-      "Реалізовано модальне вікно редагування замовлень (доступне лише для статусу 'Очікує')",
-      "Покращено dropdown меню з функціональними кнопками 'Переглянути' та 'Редагувати'",
-      "Додано валідацію для редагування замовлень залежно від статусу",
-      "Оптимізовано відображення інформації про клієнтів та постачальників",
+    title: "Система патч-нотів",
+    description:
+      "Впровадження комплексної системи відстеження оновлень з детальною статистикою та технічними деталями.",
+    features: [
+      {
+        icon: MessageSquare,
+        title: "Сторінка патч-нотів",
+        description: "Детальна інформація про всі оновлення з візуальною ієрархією",
+        status: "new",
+      },
+      {
+        icon: BarChart3,
+        title: "Статистика релізів",
+        description: "Метрики продуктивності та покращень для кожного оновлення",
+        status: "new",
+      },
+      {
+        icon: Code,
+        title: "Технічні деталі",
+        description: "Детальна інформація про технічні зміни для розробників",
+        status: "new",
+      },
+      {
+        icon: Star,
+        title: "Система версій",
+        description: "Семантичне версіонування з типами релізів",
+        status: "new",
+      },
+    ],
+    stats: [
+      {
+        label: "Функцій додано",
+        value: "12+",
+        change: "+12",
+        trend: "up",
+      },
+      {
+        label: "Покращень UX",
+        value: "8",
+        change: "+8",
+        trend: "up",
+      },
+      {
+        label: "Технічних змін",
+        value: "15",
+        change: "+15",
+        trend: "up",
+      },
     ],
   },
   {
     version: "2.2.0",
-    date: "15 січня 2025",
-    type: "major",
-    title: "Консистентна система статусних бейджів",
-    changes: [
-      "Стандартизовано кольорову схему для всіх статусних бейджів в додатку",
-      "Додано hover ефекти та анімації для всіх бейджів статусів",
-      "Оновлено бейдж підписки на сторінці налаштувань з консистентним стилем",
-      "Реалізовано градієнтні фони та ефекти для покращення візуального досвіду",
-      "Покращено читабельність та доступність статусних індикаторів",
-    ],
-  },
-  {
-    version: "2.1.8",
-    date: "15 січня 2025",
-    type: "patch",
-    title: "Покращення футера та стилізації",
-    changes: [
-      "Спрощено дизайн футера з консистентним стилем",
-      "Видалено зайві елементи та об'єднано текст в одну лінію",
-      "Покращено адаптивність футера на різних розмірах екранів",
-      "Оптимізовано кольорову схему для кращої читабельності",
-    ],
-  },
-  {
-    version: "2.1.5",
-    date: "14 січня 2025",
+    date: "13 січня 2025",
     type: "minor",
-    title: "Покращення системи ролей та навігації",
-    changes: [
-      "Оптимізовано сайдбар для різних ролей користувачів (дропшиппер/постачальник)",
-      "Покращено активні стани навігаційних елементів",
-      "Додано градієнтні ефекти для активних пунктів меню",
-      "Реалізовано плавні переходи та анімації в навігації",
-      "Покращено мобільну версію сайдбара з backdrop blur ефектом",
+    title: "Розширена аналітика",
+    description: "Додавання комплексної системи аналітики з інтерактивними графіками та детальними звітами.",
+    features: [
+      {
+        icon: BarChart3,
+        title: "Інтерактивні графіки",
+        description: "Динамічні графіки продажів, прибутку та конверсії",
+        status: "new",
+      },
+      {
+        icon: TrendingUp,
+        title: "Аналіз трендів",
+        description: "Автоматичний аналіз трендів продажів та прогнозування",
+        status: "new",
+      },
+      {
+        icon: Target,
+        title: "KPI дашборд",
+        description: "Ключові показники ефективності в реальному часі",
+        status: "new",
+      },
+      {
+        icon: Calendar,
+        title: "Періодні звіти",
+        description: "Автоматичні звіти за день, тиждень, місяць",
+        status: "new",
+      },
+    ],
+    stats: [
+      {
+        label: "Метрик додано",
+        value: "25+",
+        change: "+25",
+        trend: "up",
+      },
+      {
+        label: "Швидкість аналізу",
+        value: "3x",
+        change: "+200%",
+        trend: "up",
+      },
     ],
   },
   {
     version: "2.1.0",
-    date: "13 січня 2025",
-    type: "major",
-    title: "Система управління замовленнями",
-    changes: [
-      "Створено повноцінну сторінку управління замовленнями",
-      "Додано фільтрацію замовлень за статусом та пошук",
-      "Реалізовано таблицю замовлень з детальною інформацією",
-      "Додано кольорові бейджі для різних статусів замовлень",
-      "Інтегровано dropdown меню з діями для кожного замовлення",
+    date: "12 січня 2025",
+    type: "minor",
+    title: "Система управління товарами",
+    description: "Повноцінна система для управління товарами з розширеними можливостями фільтрації та пошуку.",
+    features: [
+      {
+        icon: Package,
+        title: "Каталог товарів",
+        description: "Повний каталог з фото, описами та характеристиками",
+        status: "new",
+      },
+      {
+        icon: Search,
+        title: "Розумний пошук",
+        description: "Пошук за назвою, SKU, категорією з автодоповненням",
+        status: "new",
+      },
+      {
+        icon: Filter,
+        title: "Фільтри товарів",
+        description: "Багаторівневі фільтри за категоріями, ціною, статусом",
+        status: "new",
+      },
+      {
+        icon: Edit,
+        title: "Редагування товарів",
+        description: "Швидке редагування характеристик та цін",
+        status: "new",
+      },
     ],
   },
   {
     version: "2.0.0",
     date: "10 січня 2025",
     type: "major",
-    title: "Великий редизайн платформи DropSpace",
-    changes: [
-      "Повністю оновлений дизайн з космічною темою та градієнтами",
-      "Реалізовано темну тему з синьо-фіолетовою кольоровою палітрою",
-      "Створено нову систему компонентів з консистентним стилем",
-      "Додано анімації та ефекти для покращення користувацького досвіду",
-      "Оптимізовано адаптивність для всіх типів пристроїв",
-      "Інтегровано нову типографіку та іконографію",
+    title: "Система замовлень",
+    description: "Запуск повноцінної системи управління замовленнями з автоматизацією процесів.",
+    features: [
+      {
+        icon: ShoppingCart,
+        title: "Управління замовленнями",
+        description: "Повний цикл обробки замовлень від створення до доставки",
+        status: "new",
+      },
+      {
+        icon: Bell,
+        title: "Сповіщення",
+        description: "Автоматичні сповіщення про зміну статусу замовлень",
+        status: "new",
+      },
+      {
+        icon: Users,
+        title: "CRM система",
+        description: "Управління клієнтами та історія взаємодій",
+        status: "new",
+      },
+      {
+        icon: RefreshCw,
+        title: "Автоматизація",
+        description: "Автоматичне оновлення статусів та інвентарю",
+        status: "new",
+      },
+    ],
+    stats: [
+      {
+        label: "Замовлень оброблено",
+        value: "1000+",
+        change: "Запуск",
+        trend: "up",
+      },
+      {
+        label: "Час обробки",
+        value: "-75%",
+        change: "Покращення",
+        trend: "up",
+      },
     ],
   },
   {
-    version: "1.9.5",
+    version: "1.5.0",
     date: "8 січня 2025",
     type: "minor",
-    title: "Початкова структура CRM системи",
-    changes: [
-      "Створено базову архітектуру додатку з Next.js App Router",
-      "Реалізовано систему автентифікації та ролей користувачів",
-      "Додано базові сторінки для дропшипперів та постачальників",
-      "Створено контекст для управління ролями користувачів",
-      "Інтегровано shadcn/ui компоненти для консистентного UI",
+    title: "Система ролей",
+    description: "Впровадження системи ролей користувачів з різними рівнями доступу.",
+    features: [
+      {
+        icon: Shield,
+        title: "Ролі користувачів",
+        description: "Дропшиппери, постачальники з різними правами доступу",
+        status: "new",
+      },
+      {
+        icon: Lock,
+        title: "Контроль доступу",
+        description: "Гранульований контроль доступу до функцій",
+        status: "new",
+      },
+      {
+        icon: User,
+        title: "Профілі користувачів",
+        description: "Детальні профілі з налаштуваннями ролей",
+        status: "new",
+      },
+    ],
+  },
+  {
+    version: "1.4.0",
+    date: "5 січня 2025",
+    type: "minor",
+    title: "Система підписок",
+    description: "Запуск багаторівневої системи підписок з різними можливостями.",
+    features: [
+      {
+        icon: CreditCard,
+        title: "Плани підписок",
+        description: "Test, Standard, Cosmos з різними можливостями",
+        status: "new",
+      },
+      {
+        icon: Star,
+        title: "Преміум функції",
+        description: "Розширені можливості для преміум користувачів",
+        status: "new",
+      },
+      {
+        icon: Rocket,
+        title: "Cosmos план",
+        description: "Найпотужніший план з усіма можливостями",
+        status: "new",
+      },
+    ],
+  },
+  {
+    version: "1.3.0",
+    date: "3 січня 2025",
+    type: "minor",
+    title: "Покращення UI/UX",
+    description: "Масштабне оновлення інтерфейсу з космічною темою та покращеною навігацією.",
+    features: [
+      {
+        icon: Palette,
+        title: "Космічна тема",
+        description: "Новий дизайн з градієнтами та космічними ефектами",
+        status: "new",
+      },
+      {
+        icon: Sparkles,
+        title: "Анімації",
+        description: "Плавні переходи та мікроанімації",
+        status: "new",
+      },
+      {
+        icon: Layout,
+        title: "Покращена навігація",
+        description: "Інтуїтивна навігація з швидким доступом",
+        status: "improved",
+      },
+    ],
+  },
+  {
+    version: "1.2.0",
+    date: "1 січня 2025",
+    type: "minor",
+    title: "Система аутентифікації",
+    description: "Безпечна система входу та реєстрації з захистом даних.",
+    features: [
+      {
+        icon: Lock,
+        title: "Безпечний вхід",
+        description: "Двофакторна аутентифікація та шифрування",
+        status: "new",
+      },
+      {
+        icon: User,
+        title: "Реєстрація користувачів",
+        description: "Простий процес реєстрації з верифікацією",
+        status: "new",
+      },
+      {
+        icon: Shield,
+        title: "Захист даних",
+        description: "Шифрування персональних даних користувачів",
+        status: "new",
+      },
+    ],
+  },
+  {
+    version: "1.1.0",
+    date: "28 грудня 2024",
+    type: "minor",
+    title: "Базовий дашборд",
+    description: "Створення основного дашборду з ключовими метриками та навігацією.",
+    features: [
+      {
+        icon: BarChart3,
+        title: "Статистичні картки",
+        description: "Ключові метрики бізнесу на головній сторінці",
+        status: "new",
+      },
+      {
+        icon: Layout,
+        title: "Навігаційна панель",
+        description: "Зручна бічна панель з основними розділами",
+        status: "new",
+      },
+      {
+        icon: TrendingUp,
+        title: "Графіки продуктивності",
+        description: "Візуалізація основних показників",
+        status: "new",
+      },
+    ],
+  },
+  {
+    version: "1.0.0",
+    date: "25 грудня 2024",
+    type: "major",
+    title: "Запуск DropSpace",
+    description: "Офіційний запуск платформи DropSpace - революційної CRM системи для дропшиппінгу.",
+    features: [
+      {
+        icon: Rocket,
+        title: "Платформа запущена",
+        description: "Перша версія DropSpace готова до використання",
+        status: "new",
+      },
+      {
+        icon: Globe,
+        title: "Веб-інтерфейс",
+        description: "Сучасний веб-інтерфейс з адаптивним дизайном",
+        status: "new",
+      },
+      {
+        icon: Database,
+        title: "База даних",
+        description: "Надійна система зберігання даних",
+        status: "new",
+      },
+      {
+        icon: Coffee,
+        title: "Готово до роботи",
+        description: "Всі основні функції готові для користувачів",
+        status: "new",
+      },
+    ],
+    stats: [
+      {
+        label: "Днів розробки",
+        value: "180",
+        change: "Завершено",
+        trend: "up",
+      },
+      {
+        label: "Функцій",
+        value: "50+",
+        change: "Реалізовано",
+        trend: "up",
+      },
     ],
   },
 ]
 
-const getTypeIcon = (type: string) => {
-  switch (type) {
-    case "major":
-      return <Star className="w-4 h-4" />
-    case "minor":
-      return <Zap className="w-4 h-4" />
-    case "patch":
-      return <Bug className="w-4 h-4" />
-    default:
-      return <Shield className="w-4 h-4" />
-  }
-}
-
-const getTypeBadge = (type: string) => {
-  switch (type) {
-    case "major":
-      return (
-        <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
-          Велике оновлення
-        </Badge>
-      )
-    case "minor":
-      return (
-        <Badge className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0 hover:from-blue-700 hover:to-cyan-700 transition-all duration-300">
-          Нові функції
-        </Badge>
-      )
-    case "patch":
-      return (
-        <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 hover:from-green-700 hover:to-emerald-700 transition-all duration-300">
-          Виправлення
-        </Badge>
-      )
-    default:
-      return (
-        <Badge className="bg-gradient-to-r from-gray-600 to-slate-600 text-white border-0 hover:from-gray-700 hover:to-slate-700 transition-all duration-300">
-          Оновлення
-        </Badge>
-      )
-  }
-}
-
-const getFeatureIcon = (change: string) => {
-  if (change.includes("модальне") || change.includes("вікно")) return <Eye className="w-3 h-3" />
-  if (change.includes("редагування") || change.includes("редагувати")) return <Edit className="w-3 h-3" />
-  if (change.includes("навігації") || change.includes("сайдбар")) return <Navigation className="w-3 h-3" />
-  if (change.includes("дизайн") || change.includes("стиль")) return <Palette className="w-3 h-3" />
-  return null
-}
-
 export default function WhatsNewPage() {
+  const getVersionBadge = (type: string) => {
+    switch (type) {
+      case "major":
+        return <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0">Major</Badge>
+      case "minor":
+        return <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0">Minor</Badge>
+      case "patch":
+        return <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">Patch</Badge>
+      default:
+        return <Badge className="bg-gradient-to-r from-gray-500 to-slate-500 text-white border-0">Release</Badge>
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "new":
+        return <Sparkles className="w-4 h-4 text-green-400" />
+      case "improved":
+        return <TrendingUp className="w-4 h-4 text-blue-400" />
+      case "fixed":
+        return <CheckCircle className="w-4 h-4 text-purple-400" />
+      default:
+        return <Star className="w-4 h-4 text-yellow-400" />
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "new":
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Нове</Badge>
+      case "improved":
+        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">Покращено</Badge>
+      case "fixed":
+        return <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">Виправлено</Badge>
+      default:
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">Оновлено</Badge>
+    }
+  }
+
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case "up":
+        return <TrendingUp className="w-4 h-4 text-green-400" />
+      case "down":
+        return <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />
+      default:
+        return <Target className="w-4 h-4 text-gray-400" />
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-4 pulse-glow">
-            <span className="text-white text-xl font-bold">!</span>
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Нове у DropSpace
-            </h1>
-            <p className="text-gray-400 text-lg">Хронологія розвитку нашої космічної CRM платформи</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Нове у DropSpace</h1>
+            <p className="text-sm sm:text-base text-gray-400">Останні оновлення та покращення платформи</p>
           </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-4 text-center">
+              <div className="text-lg sm:text-2xl font-bold text-white">{patchNotes.length}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Релізів</div>
+            </CardContent>
+          </Card>
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-4 text-center">
+              <div className="text-lg sm:text-2xl font-bold text-white">
+                {patchNotes.reduce((sum, note) => sum + note.features.length, 0)}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400">Функцій</div>
+            </CardContent>
+          </Card>
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-4 text-center">
+              <div className="text-lg sm:text-2xl font-bold text-white">
+                {patchNotes.filter((note) => note.type === "major").length}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400">Major релізів</div>
+            </CardContent>
+          </Card>
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-4 text-center">
+              <div className="text-lg sm:text-2xl font-bold text-white">25</div>
+              <div className="text-xs sm:text-sm text-gray-400">Днів активності</div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 border-purple-500/30">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-400 text-sm font-medium">Всього оновлень</p>
-                <p className="text-2xl font-bold text-white">{patchNotes.length}</p>
-              </div>
-              <Star className="w-8 h-8 text-purple-400" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-blue-600/10 to-cyan-600/10 border-blue-500/30">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-400 text-sm font-medium">Нових функцій</p>
-                <p className="text-2xl font-bold text-white">
-                  {patchNotes.filter((note) => note.type === "minor").length}
-                </p>
-              </div>
-              <Zap className="w-8 h-8 text-blue-400" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-green-600/10 to-emerald-600/10 border-green-500/30">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-400 text-sm font-medium">Виправлень</p>
-                <p className="text-2xl font-bold text-white">
-                  {patchNotes.filter((note) => note.type === "patch").length}
-                </p>
-              </div>
-              <Bug className="w-8 h-8 text-green-400" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Patch Notes */}
-      <div className="space-y-6">
+      <div className="space-y-6 sm:space-y-8">
         {patchNotes.map((note, index) => (
-          <Card
-            key={index}
-            className="space-gradient border-slate-700 hover:border-blue-500/30 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 group"
-          >
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg border border-blue-500/30 group-hover:border-blue-400/50 transition-colors duration-300">
-                    {getTypeIcon(note.type)}
+          <Card key={note.version} className="space-gradient border-slate-700 overflow-hidden">
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">v{note.version}</h2>
+                    {getVersionBadge(note.type)}
+                    {index === 0 && (
+                      <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 animate-pulse">
+                        Останнє
+                      </Badge>
+                    )}
                   </div>
-                  <CardTitle className="text-white text-xl group-hover:text-blue-300 transition-colors duration-300">
-                    {note.title}
-                  </CardTitle>
-                  {getTypeBadge(note.type)}
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">{note.title}</h3>
+                  <p className="text-sm sm:text-base text-gray-400">{note.description}</p>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm">{note.date}</span>
-                  <Badge variant="outline" className="border-slate-600 text-gray-300 font-mono">
-                    v{note.version}
-                  </Badge>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <Calendar className="w-4 h-4" />
+                    {note.date}
+                  </div>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {note.changes.map((change, changeIndex) => (
-                  <li
-                    key={changeIndex}
-                    className="flex items-start gap-3 text-gray-300 group/item hover:text-gray-200 transition-colors duration-200"
-                  >
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className="w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex-shrink-0 group-hover/item:scale-125 transition-transform duration-200"></div>
-                      {getFeatureIcon(change) && (
-                        <div className="text-blue-400 opacity-70">{getFeatureIcon(change)}</div>
-                      )}
+
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-6">
+              {/* Features */}
+              <div>
+                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-400" />
+                  Основні зміни
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {note.features.map((feature, featureIndex) => (
+                    <div
+                      key={featureIndex}
+                      className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <feature.icon className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h5 className="font-medium text-white text-sm">{feature.title}</h5>
+                            {getStatusBadge(feature.status)}
+                          </div>
+                          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">{feature.description}</p>
+                        </div>
+                      </div>
                     </div>
-                    <span className="leading-relaxed">{change}</span>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stats */}
+              {note.stats && (
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-green-400" />
+                    Статистика релізу
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {note.stats.map((stat, statIndex) => (
+                      <div key={statIndex} className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-400">{stat.label}</span>
+                            {getTrendIcon(stat.trend)}
+                          </div>
+                          <div className="text-lg sm:text-xl font-bold text-white">{stat.value}</div>
+                          <div
+                            className={`text-xs ${
+                              stat.trend === "up"
+                                ? "text-green-400"
+                                : stat.trend === "down"
+                                  ? "text-red-400"
+                                  : "text-gray-400"
+                            }`}
+                          >
+                            {stat.change}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Technical Details */}
+              {note.technical && (
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Code className="w-5 h-5 text-purple-400" />
+                    Технічні деталі
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {note.technical.map((tech, techIndex) => (
+                      <div key={techIndex} className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+                        <h5 className="font-medium text-white mb-3">{tech.title}</h5>
+                        <ul className="space-y-2">
+                          {tech.items.map((item, itemIndex) => (
+                            <li key={itemIndex} className="flex items-start gap-2 text-sm text-gray-400">
+                              <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Footer */}
-      <div className="mt-12 text-center">
-        <Card className="bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 border-slate-700/50 inline-block">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-gray-300">Система постійно розвивається та оновлюється</span>
+      <Card className="space-gradient border-slate-700">
+        <CardContent className="p-6 sm:p-8 text-center">
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <Heart className="w-5 h-5 text-red-400" />
+              <span className="text-white font-medium">Дякуємо за використання DropSpace!</span>
             </div>
-            <p className="text-gray-400 text-sm mt-2">
-              Маєте ідеї для покращень?
-              <span className="text-blue-400 hover:text-blue-300 cursor-pointer ml-1 transition-colors duration-200">
-                Поділіться з нами!
-              </span>
+            <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
+              Ми постійно працюємо над покращенням платформи. Якщо у вас є ідеї або пропозиції, будь ласка, зв'яжіться з
+              нами.
             </p>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button variant="outline" className="bg-transparent border-slate-600 min-h-[44px]">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Залишити відгук
+              </Button>
+              <Button variant="outline" className="bg-transparent border-slate-600 min-h-[44px]">
+                <Github className="w-4 h-4 mr-2" />
+                GitHub
+              </Button>
+              <Button className="cosmic-glow min-h-[44px]">
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Документація
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
