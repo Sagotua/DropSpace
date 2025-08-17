@@ -1,299 +1,341 @@
 "use client"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { User, Camera, Save, Shield, Bell, CreditCard, Eye, EyeOff } from "lucide-react"
-import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Textarea } from "@/components/ui/textarea"
+import { User, Shield, Bell, CreditCard, Eye, EyeOff, Upload, Smartphone, Mail } from "lucide-react"
 
-const SettingsPage = () => {
+export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState("profile")
   const [showPassword, setShowPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const tabs = [
+    { id: "profile", label: "Профіль", icon: User, mobileLabel: "Профіль" },
+    { id: "security", label: "Безпека", icon: Shield, mobileLabel: "Безпека" },
+    { id: "notifications", label: "Сповіщення", icon: Bell, mobileLabel: "Сповіщ." },
+    { id: "billing", label: "Підписка", icon: CreditCard, mobileLabel: "Підписка", hideOnMobile: true },
+  ]
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white">Налаштування</h1>
-        <p className="text-gray-400">Керуйте своїм профілем та налаштуваннями акаунту</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Налаштування</h1>
+        <p className="text-sm sm:text-base text-gray-400">Керуйте своїм профілем та налаштуваннями акаунту</p>
       </div>
 
-      {/* Mobile-Responsive Tabs */}
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4 bg-slate-800/50 border border-slate-700">
-          <TabsTrigger
-            value="profile"
-            className="text-xs lg:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+      {/* Tab Navigation - Mobile Responsive */}
+      <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
+        {tabs.map((tab) => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? "default" : "outline"}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm ${
+              tab.hideOnMobile ? "hidden lg:flex" : ""
+            } ${
+              activeTab === tab.id
+                ? "cosmic-glow"
+                : "bg-slate-800 border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+            }`}
           >
-            Профіль
-          </TabsTrigger>
-          <TabsTrigger
-            value="security"
-            className="text-xs lg:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-          >
-            Безпека
-          </TabsTrigger>
-          <TabsTrigger
-            value="notifications"
-            className="text-xs lg:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white hidden sm:inline"
-          >
-            Сповіщення
-          </TabsTrigger>
-          <TabsTrigger
-            value="billing"
-            className="text-xs lg:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white hidden lg:block"
-          >
-            Підписка
-          </TabsTrigger>
-        </TabsList>
+            <tab.icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.mobileLabel}</span>
+          </Button>
+        ))}
+      </div>
 
-        <TabsContent value="profile" className="space-y-6">
-          <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700">
+      {/* Tab Content */}
+      {activeTab === "profile" && (
+        <div className="space-y-6">
+          {/* Profile Information */}
+          <Card className="space-gradient border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white text-lg lg:text-xl">Інформація профілю</CardTitle>
-              <CardDescription className="text-gray-400">
-                Оновіть свою особисту інформацію та налаштування профілю
-              </CardDescription>
+              <CardTitle className="text-white">Інформація профілю</CardTitle>
+              <CardDescription className="text-gray-400">Оновіть свою особисту інформацію</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Avatar Section - Mobile Responsive */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
-                  </div>
-                  <Button
-                    size="sm"
-                    className="absolute -bottom-2 -right-2 w-8 h-8 lg:w-10 lg:h-10 rounded-full p-0 bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Camera className="w-3 h-3 lg:w-4 lg:h-4" />
+                <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
+                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarFallback className="bg-slate-700 text-white text-lg">ДК</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-white font-medium">Дмитро Коваленко</h3>
+                  <p className="text-gray-400 text-sm">dmitro.kovalenko@example.com</p>
+                  <Button size="sm" className="mt-2 min-h-[36px] bg-transparent" variant="outline">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Змінити фото
                   </Button>
-                </div>
-                <div className="text-center sm:text-left">
-                  <h3 className="font-semibold text-white text-base lg:text-lg">Іван Петренко</h3>
-                  <p className="text-gray-400 text-sm">ivan.petrenko@example.com</p>
-                  <Badge className="mt-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0">
-                    Активна підписка
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Form Fields - Mobile Single Column */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-gray-300">
-                    Ім'я
-                  </Label>
-                  <Input
-                    id="firstName"
-                    defaultValue="Іван"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-gray-300">
-                    Прізвище
-                  </Label>
-                  <Input
-                    id="lastName"
-                    defaultValue="Петренко"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-                <div className="space-y-2 lg:col-span-2">
-                  <Label htmlFor="email" className="text-gray-300">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    defaultValue="ivan.petrenko@example.com"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-gray-300">
-                    Телефон
-                  </Label>
-                  <Input
-                    id="phone"
-                    defaultValue="+380 67 123 45 67"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-gray-300">
-                    Компанія
-                  </Label>
-                  <Input
-                    id="company"
-                    defaultValue="DropSpace Ltd."
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-              </div>
-
-              <Button className="w-full lg:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 min-h-[44px]">
-                <Save className="mr-2 h-4 w-4" />
-                Зберегти зміни
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="security" className="space-y-6">
-          <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white text-lg lg:text-xl flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Безпека акаунту
-              </CardTitle>
-              <CardDescription className="text-gray-400">Керуйте паролем та налаштуваннями безпеки</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword" className="text-gray-300">
-                    Поточний пароль
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="currentPassword"
-                      type={showPassword ? "text" : "password"}
-                      className="bg-slate-800/50 border-slate-600 text-white min-h-[44px] pr-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-gray-300">
-                    Новий пароль
-                  </Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-gray-300">
-                    Підтвердити пароль
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    className="bg-slate-800/50 border-slate-600 text-white min-h-[44px]"
-                  />
                 </div>
               </div>
 
               <Separator className="bg-slate-700" />
 
-              <div className="space-y-4">
-                <h4 className="text-white font-medium">Двофакторна автентифікація</h4>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <p className="text-gray-300 text-sm">Увімкнути 2FA для додаткової безпеки</p>
-                    <p className="text-gray-500 text-xs">Рекомендовано для захисту акаунту</p>
-                  </div>
-                  <Switch />
+              {/* Form Fields - Mobile Responsive */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName" className="text-white">
+                    Ім'я
+                  </Label>
+                  <Input
+                    id="firstName"
+                    defaultValue="Дмитро"
+                    className="bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="text-white">
+                    Прізвище
+                  </Label>
+                  <Input
+                    id="lastName"
+                    defaultValue="Коваленко"
+                    className="bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="email" className="text-white">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    defaultValue="dmitro.kovalenko@example.com"
+                    className="bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-white">
+                    Телефон
+                  </Label>
+                  <Input
+                    id="phone"
+                    defaultValue="+380 67 123 4567"
+                    className="bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-white">
+                    Компанія
+                  </Label>
+                  <Input
+                    id="company"
+                    defaultValue="DropSpace LLC"
+                    className="bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="bio" className="text-white">
+                    Про себе
+                  </Label>
+                  <Textarea
+                    id="bio"
+                    placeholder="Розкажіть про себе..."
+                    className="bg-slate-800 border-slate-600 text-white min-h-[100px]"
+                  />
                 </div>
               </div>
 
-              <Button className="w-full lg:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 min-h-[44px]">
-                <Save className="mr-2 h-4 w-4" />
-                Оновити пароль
-              </Button>
+              <Button className="cosmic-glow w-full sm:w-auto min-h-[44px]">Зберегти зміни</Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="notifications" className="space-y-6">
-          <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700">
+      {activeTab === "security" && (
+        <div className="space-y-6">
+          {/* Password */}
+          <Card className="space-gradient border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white text-lg lg:text-xl flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                Налаштування сповіщень
-              </CardTitle>
+              <CardTitle className="text-white">Зміна паролю</CardTitle>
+              <CardDescription className="text-gray-400">Оновіть свій пароль для безпеки акаунту</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword" className="text-white">
+                  Поточний пароль
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="currentPassword"
+                    type={showPassword ? "text" : "password"}
+                    className="bg-slate-800 border-slate-600 text-white pr-10 min-h-[44px]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword" className="text-white">
+                  Новий пароль
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    className="bg-slate-800 border-slate-600 text-white pr-10 min-h-[44px]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-white">
+                  Підтвердіть новий пароль
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="bg-slate-800 border-slate-600 text-white pr-10 min-h-[44px]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <Button className="cosmic-glow w-full sm:w-auto min-h-[44px]">Змінити пароль</Button>
+            </CardContent>
+          </Card>
+
+          {/* Two-Factor Authentication */}
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Двофакторна автентифікація</CardTitle>
               <CardDescription className="text-gray-400">
-                Керуйте тим, як і коли ви отримуєте сповіщення
+                Додайте додатковий рівень безпеки до вашого акаунту
               </CardDescription>
             </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-gray-400" />
+                    <span className="text-white">SMS автентифікація</span>
+                    <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Вимкнено</Badge>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-1">Отримуйте коди підтвердження через SMS</p>
+                </div>
+                <Switch />
+              </div>
+              <Separator className="bg-slate-700" />
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <span className="text-white">Email автентифікація</span>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Увімкнено</Badge>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-1">Отримуйте коди підтвердження на email</p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === "notifications" && (
+        <div className="space-y-6">
+          <Card className="space-gradient border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Налаштування сповіщень</CardTitle>
+              <CardDescription className="text-gray-400">Керуйте тим, як ви отримуєте сповіщення</CardDescription>
+            </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-white font-medium">Email сповіщення</h4>
-                    <p className="text-gray-400 text-sm">Отримувати сповіщення на email</p>
+              {/* Email Notifications */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Email сповіщення</h4>
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <span className="text-white">Нові замовлення</span>
+                      <p className="text-sm text-gray-400">Сповіщення про нові замовлення</p>
+                    </div>
+                    <Switch defaultChecked />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <Separator className="bg-slate-700" />
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-white font-medium">Нові замовлення</h4>
-                    <p className="text-gray-400 text-sm">Сповіщення про нові замовлення</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <span className="text-white">Зміни статусу</span>
+                      <p className="text-sm text-gray-400">Оновлення статусу замовлень</p>
+                    </div>
+                    <Switch defaultChecked />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-white font-medium">Оновлення статусу</h4>
-                    <p className="text-gray-400 text-sm">Зміни статусу замовлень</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <span className="text-white">Нові продукти</span>
+                      <p className="text-sm text-gray-400">Сповіщення про нові продукти від постачальників</p>
+                    </div>
+                    <Switch />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-white font-medium">Маркетингові повідомлення</h4>
-                    <p className="text-gray-400 text-sm">Новини та пропозиції</p>
-                  </div>
-                  <Switch />
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-white font-medium">Звіти та аналітика</h4>
-                    <p className="text-gray-400 text-sm">Щотижневі звіти продуктивності</p>
-                  </div>
-                  <Switch defaultChecked />
                 </div>
               </div>
 
-              <Button className="w-full lg:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 min-h-[44px]">
-                <Save className="mr-2 h-4 w-4" />
-                Зберегти налаштування
-              </Button>
+              <Separator className="bg-slate-700" />
+
+              {/* Push Notifications */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Push сповіщення</h4>
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <span className="text-white">Термінові сповіщення</span>
+                      <p className="text-sm text-gray-400">Важливі оновлення та попередження</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <span className="text-white">Маркетингові повідомлення</span>
+                      <p className="text-sm text-gray-400">Акції та спеціальні пропозиції</p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="billing" className="space-y-6 lg:block hidden">
-          <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700">
+      {activeTab === "billing" && (
+        <div className="space-y-6">
+          {/* Current Plan */}
+          <Card className="space-gradient border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white text-lg lg:text-xl flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
-                Підписка та оплата
-              </CardTitle>
+              <CardTitle className="text-white">Поточна підписка</CardTitle>
               <CardDescription className="text-gray-400">Керуйте своєю підпискою та методами оплати</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -301,52 +343,74 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-white font-medium">Cosmos Plan</h4>
-                    <p className="text-gray-300 text-sm">$25/місяць • Активна до 15.02.2024</p>
+                    <p className="text-gray-400 text-sm">Максимальний план з усіма функціями</p>
                   </div>
-                  <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0">Активна</Badge>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-white">$25</p>
+                    <p className="text-gray-400 text-sm">на місяць</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                  <Button variant="outline" className="flex-1 min-h-[44px] bg-transparent">
+                    Змінити план
+                  </Button>
+                  <Button variant="outline" className="flex-1 min-h-[44px] bg-transparent">
+                    Скасувати підписку
+                  </Button>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="text-white font-medium">Методи оплати</h4>
-                <div className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+              {/* Payment Method */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Метод оплати</h4>
+                <div className="p-4 bg-slate-800 border border-slate-600 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
                         <CreditCard className="w-4 h-4 text-white" />
                       </div>
                       <div>
-                        <p className="text-white text-sm">•••• •••• •••• 4242</p>
-                        <p className="text-gray-400 text-xs">Expires 12/25</p>
+                        <p className="text-white">•••• •••• •••• 4242</p>
+                        <p className="text-gray-400 text-sm">Закінчується 12/25</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className="border-slate-600 text-gray-300">
-                      Основна
-                    </Badge>
+                    <Button variant="outline" size="sm" className="min-h-[36px] bg-transparent">
+                      Змінити
+                    </Button>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="outline"
-                  className="border-slate-600 text-gray-300 hover:bg-slate-800 min-h-[44px] bg-transparent"
-                >
-                  Змінити план
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-slate-600 text-gray-300 hover:bg-slate-800 min-h-[44px] bg-transparent"
-                >
-                  Додати картку
-                </Button>
+              {/* Billing History */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Історія платежів</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                    <div>
+                      <p className="text-white">Cosmos Plan</p>
+                      <p className="text-gray-400 text-sm">15 січня 2024</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white">$25.00</p>
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Оплачено</Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                    <div>
+                      <p className="text-white">Cosmos Plan</p>
+                      <p className="text-gray-400 text-sm">15 грудня 2023</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white">$25.00</p>
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Оплачено</Badge>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   )
 }
-
-export default SettingsPage

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Package, Plus, Search, Edit, Trash2, Eye, TrendingUp, DollarSign, Star } from "lucide-react"
+import {
+  Package,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  TrendingUp,
+  DollarSign,
+  Star,
+  Grid3X3,
+  LayoutGrid,
+} from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 interface Product {
@@ -39,7 +52,7 @@ interface Product {
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Бездротові навушники AirPods Pro",
+    name: "Бездротові навушники AirPods Pro Max Ultra Premium Edition",
     sku: "APP-001",
     price: 8999,
     cost: 6500,
@@ -127,7 +140,28 @@ const mockProducts: Product[] = [
     rating: 4.9,
     createdAt: "2024-01-01",
   },
+  // Add more mock products for testing large catalogs
+  ...Array.from({ length: 50 }, (_, i) => ({
+    id: `mock-${i + 7}`,
+    name: `Тестовий продукт ${i + 7}`,
+    sku: `TEST-${String(i + 7).padStart(3, "0")}`,
+    price: Math.floor(Math.random() * 50000) + 1000,
+    cost: Math.floor(Math.random() * 30000) + 500,
+    stock: Math.floor(Math.random() * 100),
+    category: ["Електроніка", "Комп'ютери", "Аксесуари", "Планшети", "Фототехніка"][Math.floor(Math.random() * 5)],
+    status: ["active", "inactive", "out_of_stock"][Math.floor(Math.random() * 3)] as
+      | "active"
+      | "inactive"
+      | "out_of_stock",
+    image: `/placeholder.svg?height=80&width=80&text=P${i + 7}`,
+    sales: Math.floor(Math.random() * 500),
+    profit: Math.floor(Math.random() * 100000),
+    rating: Math.round((Math.random() * 2 + 3) * 10) / 10,
+    createdAt: "2024-01-01",
+  })),
 ]
+
+type DensityMode = "comfortable" | "compact"
 
 export default function MyProductsPage() {
   const { user } = useAuth()
@@ -136,7 +170,22 @@ export default function MyProductsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [densityMode, setDensityMode] = useState<DensityMode>("comfortable")
   const [isLoading, setIsLoading] = useState(false)
+
+  // Load density preference from localStorage
+  useEffect(() => {
+    const savedDensity = localStorage.getItem("product-density") as DensityMode
+    if (savedDensity) {
+      setDensityMode(savedDensity)
+    }
+  }, [])
+
+  // Save density preference to localStorage
+  const handleDensityChange = (newDensity: DensityMode) => {
+    setDensityMode(newDensity)
+    localStorage.setItem("product-density", newDensity)
+  }
 
   // Filter products based on search and filters
   useEffect(() => {
@@ -163,16 +212,17 @@ export default function MyProductsPage() {
     setProducts(products.filter((p) => p.id !== productId))
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, compact = false) => {
+    const baseClasses = compact ? "text-xs px-2 py-0.5" : "text-xs px-2 py-1"
     switch (status) {
       case "active":
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Активний</Badge>
+        return <Badge className={`bg-green-500/20 text-green-400 border-green-500/30 ${baseClasses}`}>Активний</Badge>
       case "inactive":
-        return <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">Неактивний</Badge>
+        return <Badge className={`bg-gray-500/20 text-gray-400 border-gray-500/30 ${baseClasses}`}>Неактивний</Badge>
       case "out_of_stock":
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Немає в наявності</Badge>
+        return <Badge className={`bg-red-500/20 text-red-400 border-red-500/30 ${baseClasses}`}>Немає</Badge>
       default:
-        return <Badge>{status}</Badge>
+        return <Badge className={baseClasses}>{status}</Badge>
     }
   }
 
@@ -180,234 +230,424 @@ export default function MyProductsPage() {
 
   if (!user) return null
 
+  // Compact Product Card Component
+  const CompactProductCard = ({ product }: { product: Product }) => (
+    <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-all duration-200 hover:shadow-lg h-[140px] group">
+      <CardContent className="p-3 h-full">
+        <div className="flex gap-3 h-full">
+          {/* Product Image */}
+          <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0">
+            <img
+              src={product.image || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+
+          {/* Product Info */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between">
+            {/* Header Row */}
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0 flex-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h3 className="font-medium text-white text-sm leading-tight truncate cursor-help">
+                      {product.name}
+                    </h3>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-slate-800 border-slate-600 text-white max-w-xs">
+                    <p>{product.name}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <p className="text-xs text-gray-400 truncate">{product.sku}</p>
+              </div>
+              {getStatusBadge(product.status, true)}
+            </div>
+
+            {/* Metrics Row */}
+            <div className="flex items-center gap-3 text-xs mb-2">
+              <span className="text-white font-medium">₴{product.price.toLocaleString()}</span>
+              <span className="text-gray-400">•</span>
+              <span
+                className={`font-medium ${product.stock > 10 ? "text-green-400" : product.stock > 0 ? "text-yellow-400" : "text-red-400"}`}
+              >
+                {product.stock} шт
+              </span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-300">{product.sales} продажів</span>
+            </div>
+
+            {/* Rating and Actions Row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                <span className="text-xs text-white">{product.rating}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0 hover:bg-slate-700"
+                      aria-label="Переглянути продукт"
+                    >
+                      <Eye className="w-3 h-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Переглянути</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0 hover:bg-slate-700"
+                      aria-label="Редагувати продукт"
+                    >
+                      <Edit className="w-3 h-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Редагувати</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <AlertDialog>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0 hover:bg-red-900/20"
+                          aria-label="Видалити продукт"
+                        >
+                          <Trash2 className="w-3 h-3 text-red-400" />
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>Видалити</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <AlertDialogContent className="bg-slate-900 border-slate-700">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-white">Видалити товар?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-400">
+                        Ця дія незворотна. Товар "{product.name}" буде видалено назавжди.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="bg-slate-800 border-slate-600 text-white">
+                        Скасувати
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Видалити
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  // Comfortable Product Card Component (existing design)
+  const ComfortableProductCard = ({ product }: { product: Product }) => (
+    <Card className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-start gap-4">
+          {/* Product Image */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0">
+            <img
+              src={product.image || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+
+          {/* Product Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-white text-sm sm:text-base truncate">{product.name}</h3>
+                <p className="text-xs sm:text-sm text-gray-400">SKU: {product.sku}</p>
+              </div>
+              {getStatusBadge(product.status)}
+            </div>
+
+            {/* Price and Stock */}
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Ціна:</span>
+                <span className="text-white font-semibold">₴{product.price.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Залишок:</span>
+                <span
+                  className={`font-semibold ${product.stock > 10 ? "text-green-400" : product.stock > 0 ? "text-yellow-400" : "text-red-400"}`}
+                >
+                  {product.stock} шт
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Продажі:</span>
+                <span className="text-white">{product.sales}</span>
+              </div>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-1 mt-2">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <span className="text-sm text-white">{product.rating}</span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 mt-4">
+              <Button size="sm" variant="outline" className="flex-1 min-h-[36px] text-xs sm:text-sm bg-transparent">
+                <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Переглянути
+              </Button>
+              <Button size="sm" variant="outline" className="flex-1 min-h-[36px] text-xs sm:text-sm bg-transparent">
+                <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Редагувати
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="min-w-[36px] min-h-[36px] p-0 bg-transparent">
+                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-slate-900 border-slate-700">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-white">Видалити товар?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-gray-400">
+                      Ця дія незворотна. Товар буде видалено назавжди.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="bg-slate-800 border-slate-600 text-white">
+                      Скасувати
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Видалити
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  // Grid class based on density mode
+  const getGridClasses = () => {
+    if (densityMode === "compact") {
+      return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3"
+    }
+    return "grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+  }
+
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">Мої товари</h1>
-        <p className="text-sm sm:text-base text-gray-400">Керуйте вашим асортиментом товарів</p>
-      </div>
+    <TooltipProvider>
+      <div className="space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Мої товари</h1>
+            <p className="text-sm sm:text-base text-gray-400">Керуйте вашим асортиментом товарів</p>
+          </div>
 
-      {/* Stats Cards - Mobile Responsive */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <Card className="space-gradient border-slate-700">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-400">Всього товарів</p>
-                <p className="text-lg sm:text-2xl font-bold text-white">{totalProducts}</p>
-              </div>
-              <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="space-gradient border-slate-700">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-400">Активні</p>
-                <p className="text-lg sm:text-2xl font-bold text-white">{activeProducts}</p>
-              </div>
-              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="space-gradient border-slate-700 col-span-2 lg:col-span-1">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-400">Вартість складу</p>
-                <p className="text-lg sm:text-2xl font-bold text-white">₴{totalValue.toLocaleString()}</p>
-              </div>
-              <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="space-gradient border-slate-700 col-span-2 lg:col-span-1">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-400">Загальний прибуток</p>
-                <p className="text-lg sm:text-2xl font-bold text-white">₴{totalProfit.toLocaleString()}</p>
-              </div>
-              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters and Search - Mobile Responsive */}
-      <Card className="space-gradient border-slate-700">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Пошук товарів..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-600 text-white min-h-[44px]"
-              />
-            </div>
-
-            {/* Filters - Stack on mobile */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-slate-800 border-slate-600 text-white min-h-[44px]">
-                  <SelectValue placeholder="Категорія" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="all">Всі категорії</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-slate-800 border-slate-600 text-white min-h-[44px]">
-                  <SelectValue placeholder="Статус" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="all">Всі статуси</SelectItem>
-                  <SelectItem value="active">Активні</SelectItem>
-                  <SelectItem value="inactive">Неактивні</SelectItem>
-                  <SelectItem value="out_of_stock">Немає в наявності</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button className="cosmic-glow min-h-[44px] w-full sm:w-auto">
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="sm:inline">Додати товар</span>
+          {/* Density Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Щільність:</span>
+            <div className="flex items-center bg-slate-800 rounded-lg p-1">
+              <Button
+                size="sm"
+                variant={densityMode === "comfortable" ? "default" : "ghost"}
+                onClick={() => handleDensityChange("comfortable")}
+                className="h-8 px-3 text-xs"
+              >
+                <LayoutGrid className="w-3 h-3 mr-1" />
+                Зручно
+              </Button>
+              <Button
+                size="sm"
+                variant={densityMode === "compact" ? "default" : "ghost"}
+                onClick={() => handleDensityChange("compact")}
+                className="h-8 px-3 text-xs"
+              >
+                <Grid3X3 className="w-3 h-3 mr-1" />
+                Компактно
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Products Grid - Mobile Responsive */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="space-gradient border-slate-700 hover:border-slate-600 transition-colors">
+        {/* Stats Cards - Mobile Responsive */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <Card className="space-gradient border-slate-700">
             <CardContent className="p-4 sm:p-6">
-              <div className="flex items-start gap-4">
-                {/* Product Image */}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-400">Всього товарів</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">{totalProducts}</p>
                 </div>
-
-                {/* Product Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-white text-sm sm:text-base truncate">{product.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-400">SKU: {product.sku}</p>
-                    </div>
-                    {getStatusBadge(product.status)}
-                  </div>
-
-                  {/* Price and Stock */}
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Ціна:</span>
-                      <span className="text-white font-semibold">₴{product.price.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Залишок:</span>
-                      <span
-                        className={`font-semibold ${product.stock > 10 ? "text-green-400" : product.stock > 0 ? "text-yellow-400" : "text-red-400"}`}
-                      >
-                        {product.stock} шт
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Продажі:</span>
-                      <span className="text-white">{product.sales}</span>
-                    </div>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-1 mt-2">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-white">{product.rating}</span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 mt-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 min-h-[36px] text-xs sm:text-sm bg-transparent"
-                    >
-                      <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                      Переглянути
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 min-h-[36px] text-xs sm:text-sm bg-transparent"
-                    >
-                      <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                      Редагувати
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="min-w-[36px] min-h-[36px] p-0 bg-transparent">
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-slate-900 border-slate-700">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-white">Видалити товар?</AlertDialogTitle>
-                          <AlertDialogDescription className="text-gray-400">
-                            Ця дія незворотна. Товар буде видалено назавжди.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="bg-slate-800 border-slate-600 text-white">
-                            Скасувати
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Видалити
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
+                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Empty State */}
-      {filteredProducts.length === 0 && (
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-400">Активні</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">{activeProducts}</p>
+                </div>
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="space-gradient border-slate-700 col-span-2 lg:col-span-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-400">Вартість складу</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">₴{totalValue.toLocaleString()}</p>
+                </div>
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="space-gradient border-slate-700 col-span-2 lg:col-span-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-400">Загальний прибуток</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">₴{totalProfit.toLocaleString()}</p>
+                </div>
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters and Search - Mobile Responsive */}
         <Card className="space-gradient border-slate-700">
-          <CardContent className="p-8 sm:p-12 text-center">
-            <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Товари не знайдено</h3>
-            <p className="text-sm sm:text-base text-gray-400 mb-6">Спробуйте змінити фільтри або додайте новий товар</p>
-            <Button className="cosmic-glow min-h-[44px]">
-              <Plus className="w-4 h-4 mr-2" />
-              Додати перший товар
-            </Button>
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Search */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Пошук товарів..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-slate-800 border-slate-600 text-white min-h-[44px]"
+                />
+              </div>
+
+              {/* Filters - Stack on mobile */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-slate-800 border-slate-600 text-white min-h-[44px]">
+                    <SelectValue placeholder="Категорія" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="all">Всі категорії</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-slate-800 border-slate-600 text-white min-h-[44px]">
+                    <SelectValue placeholder="Статус" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="all">Всі статуси</SelectItem>
+                    <SelectItem value="active">Активні</SelectItem>
+                    <SelectItem value="inactive">Неактивні</SelectItem>
+                    <SelectItem value="out_of_stock">Немає в наявності</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button className="cosmic-glow min-h-[44px] w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  <span className="sm:inline">Додати товар</span>
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {/* Products Grid - Responsive based on density */}
+        <div className={getGridClasses()}>
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="block md:hidden">
+              {/* Mobile: Always use comfortable layout */}
+              <ComfortableProductCard product={product} />
+            </div>
+          ))}
+          {filteredProducts.map((product) => (
+            <div key={`desktop-${product.id}`} className="hidden md:block">
+              {/* Desktop: Use selected density */}
+              {densityMode === "compact" ? (
+                <CompactProductCard product={product} />
+              ) : (
+                <ComfortableProductCard product={product} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredProducts.length === 0 && (
+          <Card className="space-gradient border-slate-700">
+            <CardContent className="p-8 sm:p-12 text-center">
+              <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Товари не знайдено</h3>
+              <p className="text-sm sm:text-base text-gray-400 mb-6">
+                Спробуйте змінити фільтри або додайте новий товар
+              </p>
+              <Button className="cosmic-glow min-h-[44px]">
+                <Plus className="w-4 h-4 mr-2" />
+                Додати перший товар
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Performance indicator for large catalogs */}
+        {filteredProducts.length > 100 && (
+          <div className="text-center text-sm text-gray-400">
+            Показано {filteredProducts.length} товарів • Використовуйте компактний режим для кращої продуктивності
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
